@@ -4,12 +4,13 @@ import os
 import time
 import datetime
 
+import DataLoaderFactory
 from LSTM_model import LstmModel
-from data_loader import DataLoader
-from utils.display_functions import visualize_results
-
+from data_loader import BitcoinDataLoader
+from utils.display_functions import visualize_results, print_shape_describe_head, print_shape
 
 DEFAULT_DAYS_TO_PREDICT = 100
+DEFAULT_EPOCHS = 100
 
 
 def get_input_args():
@@ -37,7 +38,7 @@ def main(csv_data_file, days_to_predict, epochs, output_model_file):
     if not epochs:
         epochs = LstmModel.DEFAULT_EPOCHS_NUMBER
 
-    data_loader = DataLoader(csv_data_file, test_set_size=days_to_predict)
+    data_loader = DataLoaderFactory.get_data_loader(csv_data_file, days_to_predict)
     lstm_model = LstmModel()
     lstm_model.init_model()
 
@@ -45,6 +46,7 @@ def main(csv_data_file, days_to_predict, epochs, output_model_file):
     lstm_model.save_model(output_model_file)
     lstm_model.save_history_to_file("history_{}".format(output_model_file))
     y_predicted = lstm_model.test_model(data_loader.x_test)
+    print(lstm_model.evaluate_model(data_loader.x_test, data_loader.y_test))
 
     actual_price = data_loader.reverse_min_max(data_loader.y_test)
     predicted_price = data_loader.reverse_min_max(y_predicted)
@@ -57,7 +59,8 @@ def init_arg_parser():
     parser.add_argument('-f', dest='csv_data_file', help='Data file in csv format', type=str, required=True)
     parser.add_argument('-d', dest='days_to_predict', help='Days to predict. Training set = last number of days',
                         type=int, default=DEFAULT_DAYS_TO_PREDICT)
-    parser.add_argument('-e', dest='epochs', help='Number of epochs used at trainig', default=None, required=False)
+    parser.add_argument('-e', dest='epochs', help='Number of epochs used at trainig', default=DEFAULT_EPOCHS,
+                        required=False)
     current_time = str(datetime.datetime.fromtimestamp(time.time())).replace(':', '_')
     parser.add_argument('-o', dest='output_file', help='Output file to dump model to',
                         default='model_{}.cfg'.format(current_time), required=False)

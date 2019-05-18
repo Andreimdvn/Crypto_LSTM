@@ -1,4 +1,3 @@
-import json
 import pickle
 
 import keras
@@ -10,7 +9,7 @@ from utils.display_functions import display_model_train_history
 
 
 class LstmModel:
-    DEFAULT_FIRST_LAYER_UNITS = 4
+    LSTM_UNITS = 4
     DEFAULT_EPOCHS_NUMBER = 100
 
     def __init__(self, ):
@@ -24,12 +23,13 @@ class LstmModel:
         print("Saving model to file {}".format(model_config_file))
         self.model.save(model_config_file)
 
-    def init_model(self, first_layer_units=DEFAULT_FIRST_LAYER_UNITS):
+    def init_model(self, first_layer_units=LSTM_UNITS):
         model = Sequential()
         model.add(LSTM(units=first_layer_units, activation='sigmoid', input_shape=(None, 1)))
         # model.add(LSTM(units=self.first_layer_units*2, activation='sigmoid', input_shape=(None, 1)))
         model.add(Dense(units=1))
-        model.compile(optimizer='adam', loss='mean_squared_error')
+        model.compile(optimizer='adam', loss='mean_squared_error', metrics=['mae', 'mse'])
+        print(model.summary())
         self.model = model
 
     def train_model(self, x_train, y_train, epochs=DEFAULT_EPOCHS_NUMBER):
@@ -39,6 +39,9 @@ class LstmModel:
 
     def test_model(self, x_test):
         return self.model.predict(x_test)
+
+    def evaluate_model(self, x_test, y_test):
+        return self.model.metrics_names, self.model.evaluate(x_test, y_test)
 
     def save_history_to_file(self, history_file):
         out_file = open(history_file, 'wb')

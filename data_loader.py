@@ -1,17 +1,23 @@
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
-from utils.display_functions import print_shape_describe_head
+from utils.display_functions import print_shape_describe_head, print_shape
 
 
-class DataLoader:
-    def __init__(self, csv_path, test_set_size):
+class BitcoinDataLoader:
+    def __init__(self, csv_path, test_set_size, sequence_length):
+        """
+        :param csv_path: path to data csv format
+        :param test_set_size: days to predict
+        :param sequence_length: previous days used in prediction
+        """
         self.__csv_path = csv_path
         self.__days_to_predict = test_set_size
         self.__all_data_grouped_by_date = self.__read_and_group_by_date()
         self.__train_sequence_date_grouped, self.__test_sequence_date_grouped = self.__split_train_test_data()
         self.__min_max_scaler = MinMaxScaler()
         self.x_train, self.y_train, self.x_test, self.y_test = self.__normalize_data()
+        self.log_data_shapes()
 
     def __read_and_group_by_date(self):
         df = pd.read_csv(self.__csv_path)
@@ -54,3 +60,10 @@ class DataLoader:
 
     def reverse_min_max(self, values):
         return self.__min_max_scaler.inverse_transform(values)
+
+    def log_data_shapes(self):
+        print("Data loaded:")
+        print_shape(self.x_train, "x_train")
+        print_shape(self.y_train, "y_train")
+        print_shape(self.x_test, "x_test")
+        print_shape(self.y_test, "y_test")

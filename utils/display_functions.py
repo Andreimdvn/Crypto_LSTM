@@ -5,6 +5,10 @@ def print_shape_describe_head(df, title=""):
     print("\n{}\n{}\n{}\n{}\n".format(title, df.shape, df.describe(), df.head()))
 
 
+def print_shape(df, title=""):
+    print("\n{}\n{}\n".format(title, df.shape))
+
+
 def visualize_results(series, labels, colors = None, title='Price prediction', block=True):
     plt.figure(figsize=(25, 15), dpi=80, facecolor='w', edgecolor='k')
     if not colors:
@@ -30,11 +34,11 @@ def visualize_results(series, labels, colors = None, title='Price prediction', b
     plt.show(block=block)
 
 
-def display_model_train_history(model_fin_history, block=True):
+def display_model_train_history(model_fit_history, block=True):
     print("Displaying model train history")
     import matplotlib.pyplot as plt
 
-    plt.plot(model_fin_history.history['loss'])
+    plt.plot(model_fit_history.history['loss'])
     plt.title('Model loss')
     plt.ylabel('Loss')
     plt.xlabel('Epoch')

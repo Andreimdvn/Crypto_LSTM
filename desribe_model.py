@@ -14,6 +14,9 @@ def main(model_file_path, history_file_path):
 
     history_file_handle = open(history_file_path, 'rb')
     model_fit_history = pickle.load(history_file_handle)
+    print("Epochs: {}".format(len(model_fit_history.history['loss'])))
+    print("Loss:")
+    print(model_fit_history.history['loss'])
     display_model_train_history(model_fit_history)
 
 

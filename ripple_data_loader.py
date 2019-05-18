@@ -4,7 +4,7 @@ from sklearn.preprocessing import MinMaxScaler
 from utils.display_functions import print_shape_describe_head
 
 
-class DataLoader:
+class RippleDataLoader:
     def __init__(self, csv_path, test_set_size):
         self.__csv_path = csv_path
         self.__days_to_predict = test_set_size
@@ -16,11 +16,11 @@ class DataLoader:
     def __read_and_group_by_date(self):
         df = pd.read_csv(self.__csv_path)
         # fill NaN`s with previous price
-        df["Weighted_Price"].fillna(method='ffill', inplace=True)
+        df["Close"].fillna(method='ffill', inplace=True)
         print_shape_describe_head(df, "Loaded csv and filled Nan")
 
-        df['date'] = pd.to_datetime(df['Timestamp'], unit='s').dt.date
-        df_grouped_datetime = df.groupby('date')["Weighted_Price"].mean()
+        df['date'] = pd.to_datetime(df['Date'], format='%b %d, %Y').dt.date
+        df_grouped_datetime = df.groupby('date')["Close"].mean()
 
         print_shape_describe_head(df_grouped_datetime, "grouped by datetime:")
 
