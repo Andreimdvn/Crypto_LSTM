@@ -6,8 +6,7 @@ import datetime
 
 import DataLoaderFactory
 from LSTM_model import LstmModel
-from data_loader import BitcoinDataLoader
-from utils.display_functions import visualize_results, print_shape_describe_head, print_shape
+from utils.display_functions import visualize_results
 
 DEFAULT_DAYS_TO_PREDICT = 100
 DEFAULT_EPOCHS = 100

@@ -13,10 +13,10 @@ class BitcoinDataLoader:
         """
         self.__csv_path = csv_path
         self.__days_to_predict = test_set_size
+        self.__sequence_length = sequence_length
         self.__all_data_grouped_by_date = self.__read_and_group_by_date()
-        self.__train_sequence_date_grouped, self.__test_sequence_date_grouped = self.__split_train_test_data()
         self.__min_max_scaler = MinMaxScaler()
-        self.x_train, self.y_train, self.x_test, self.y_test = self.__normalize_data()
+        self.x_train, self.y_train, self.x_test, self.y_test = self.__create_sequences()
         self.log_data_shapes()
 
     def __read_and_group_by_date(self):
@@ -32,32 +32,6 @@ class BitcoinDataLoader:
 
         return df_grouped_datetime
 
-    def __split_train_test_data(self):
-        df_train = self.__all_data_grouped_by_date[:len(self.__all_data_grouped_by_date) - self.__days_to_predict]
-        df_test = self.__all_data_grouped_by_date[len(self.__all_data_grouped_by_date) - self.__days_to_predict:]
-
-        print_shape_describe_head(df_train, "Train data")
-        print_shape_describe_head(df_test, "Test data")
-
-        return df_train, df_test
-
-    def __normalize_data(self):
-        training_set = self.__train_sequence_date_grouped.values
-        training_set = np.reshape(training_set, (len(training_set), 1))
-        training_set = self.__min_max_scaler.fit_transform(training_set)
-        x_train = training_set[0: len(training_set) - 1]
-        y_train = training_set[1: len(training_set)]
-        x_train = np.reshape(x_train, (len(x_train), 1, 1))
-
-        test_set = self.__test_sequence_date_grouped.values
-        test_set = np.reshape(test_set, (len(test_set), 1))
-        test_set = self.__min_max_scaler.transform(test_set)
-        x_test = test_set[0: len(test_set) - 1]
-        y_test = test_set[1: len(test_set)]
-        x_test = np.reshape(x_test, (len(x_test), 1, 1))
-
-        return x_train, y_train, x_test, y_test
-
     def reverse_min_max(self, values):
         return self.__min_max_scaler.inverse_transform(values)
 
@@ -67,3 +41,36 @@ class BitcoinDataLoader:
         print_shape(self.y_train, "y_train")
         print_shape(self.x_test, "x_test")
         print_shape(self.y_test, "y_test")
+
+    def __create_sequences(self):
+        input_sequence = []
+        output_sequence = []
+        price_values = self.__all_data_grouped_by_date.values
+        for start_day in range(len(price_values) - self.__sequence_length - 1):
+            input_sequence.append(price_values[start_day: start_day + self.__sequence_length])
+            output_sequence.append(price_values[start_day + self.__sequence_length])
+
+        np_input = np.array(input_sequence)
+        print_shape(np_input, "debug_np_input")
+        np_output = np.array(output_sequence)
+        print_shape(np_output, "debug_np_output")
+
+        np_output = np.reshape(np_output, (len(np_output), 1))
+
+        x_train = np_input[:-self.__days_to_predict]
+        x_test = np_input[-self.__days_to_predict:]
+        y_train = np_output[:-self.__days_to_predict]
+        y_test = np_output[-self.__days_to_predict:]
+
+        x_train = np.reshape(x_train, (len(x_train) * self.__sequence_length, 1))
+        x_test = np.reshape(x_test, (len(x_test) * self.__sequence_length, 1))
+
+        x_train = self.__min_max_scaler.fit_transform(x_train)
+        x_test = self.__min_max_scaler.transform(x_test)
+        y_train = self.__min_max_scaler.transform(y_train)
+        y_test = self.__min_max_scaler.transform(y_test)
+
+        x_train = np.reshape(x_train, (len(x_train) // self.__sequence_length, self.__sequence_length, 1))
+        x_test = np.reshape(x_test, (len(x_test) // self.__sequence_length, self.__sequence_length, 1))
+
+        return x_train, y_train, x_test, y_test

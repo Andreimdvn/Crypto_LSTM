@@ -25,10 +25,11 @@ def main(csv_data_file, model_file, days_to_predict, consecutive_predictions):
         print(day_input_to_predict.shape)
         y_predicted = []
         for _ in range(days_to_predict):
-            print(day_input_to_predict)
-            day_input_to_predict = np.reshape(day_input_to_predict, (1, 1, 1))
-            day_input_to_predict = lstm_model.test_model(day_input_to_predict)
-            y_predicted.append(day_input_to_predict[0])
+            day_input_to_predict = np.reshape(day_input_to_predict, (1, day_input_to_predict.shape[0], 1))
+            new_prediction = lstm_model.test_model(day_input_to_predict)
+            print(day_input_to_predict[0][-1][0] > new_prediction[0][0], day_input_to_predict[0][-1][0], new_prediction[0][0])
+            y_predicted.append(new_prediction[0])
+            day_input_to_predict = np.append(day_input_to_predict[0][1:], new_prediction)
 
     predicted_price = data_loader.reverse_min_max(y_predicted)
     visualize_results((actual_price, predicted_price), labels=('actual BTC price', 'predicted BTC price'))
