@@ -1,6 +1,7 @@
 import pickle
 
 import keras
+from keras.callbacks import ModelCheckpoint
 from keras.models import Sequential
 from keras.layers import Dense, Dropout
 from keras.layers import LSTM
@@ -9,9 +10,10 @@ from utils.display_functions import display_model_train_history
 
 
 class LstmModel:
-    LSTM_UNITS = 30
+    LSTM_UNITS = 16
     DEFAULT_EPOCHS_NUMBER = 100
-    DEFAULT_BATCH_SIZE = 64
+    DEFAULT_BATCH_SIZE = 8
+    CHECKPOINT_DUMP_MODEL = 1
 
     def __init__(self, ):
         self.model = None
@@ -26,18 +28,31 @@ class LstmModel:
 
     def init_model(self, lstm_ouput_size=LSTM_UNITS):
         model = Sequential()
-        model.add(LSTM(units=lstm_ouput_size, activation='sigmoid', input_shape=(60, 1), return_sequences=True))
-        model.add(Dropout(0.2))
-        model.add(LSTM(units=lstm_ouput_size, activation='sigmoid'))
-        model.add(Dropout(0.2))
+        model.add(LSTM(units=lstm_ouput_size, activation='tanh', input_shape=(None, 1), return_sequences=True))
+        model.add(Dropout(0.25))
+        model.add(LSTM(units=lstm_ouput_size, activation='tanh'))
+        model.add(Dropout(0.25))
         # model.add(LSTM(units=self.first_layer_units*2, activation='sigmoid', input_shape=(None, 1)))
         model.add(Dense(units=1))
         model.compile(optimizer='adam', loss='mean_squared_error')
         print(model.summary())
         self.model = model
 
-    def train_model(self, x_train, y_train, epochs=DEFAULT_EPOCHS_NUMBER, batch_size=DEFAULT_BATCH_SIZE):
-        self.history = self.model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs)
+    def train_model(self, x_train, y_train, epochs=DEFAULT_EPOCHS_NUMBER, batch_size=DEFAULT_BATCH_SIZE,
+                    checkpoint_file_prefix='_'):
+        checkpoint = ModelCheckpoint(filepath=checkpoint_file_prefix + '_checkpoint-{epoch:02d}-{loss:.2f}.hdf5',
+                                     period=self.CHECKPOINT_DUMP_MODEL, verbose=1)
+
+        self.history = self.model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, callbacks=[checkpoint],
+                                      validation_split=0.1)
+        keras.utils.print_summary(self.model)
+        display_model_train_history(self.history, block=False)
+
+    def continue_training_model(self, x_train, y_train, epochs, batch_size=DEFAULT_BATCH_SIZE):
+        checkpoint = ModelCheckpoint(filepath='checkpoint-{epoch:02d}-{val_loss:.2f}.hdf5',
+                                     period=self.CHECKPOINT_DUMP_MODEL, verbose=1)
+
+        self.history = self.model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, callbacks=[checkpoint])
         keras.utils.print_summary(self.model)
         display_model_train_history(self.history, block=False)
 

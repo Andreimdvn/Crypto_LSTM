@@ -8,20 +8,15 @@ def print_shape_describe_head(df, title=""):
 def print_shape(df, title=""):
     print("\n{}\n{}\n".format(title, df.shape))
 
-
-def visualize_results(series, labels, colors = None, title='Price prediction', block=True):
+def visualize_results(series, labels, colors=None, title='Price prediction', block=True):
     plt.figure(figsize=(25, 15), dpi=80, facecolor='w', edgecolor='k')
     if not colors:
         colors = ['red', 'black', 'blue', 'yellow'][:len(series)]
     for one_series, label, color in zip(series, labels, colors):
         plt.plot(one_series, color=color, label=label)
+        plt.plot(one_series, '+', color=color, label=label)
 
     plt.title(title, fontsize=40)
-
-    # df_test = df_test.reset_index()
-    # x = df_test.index
-    # labels = df_test['date']
-    # plt.xticks(x, labels, rotation='vertical')
 
     ax = plt.gca()
     for tick in ax.xaxis.get_major_ticks():
