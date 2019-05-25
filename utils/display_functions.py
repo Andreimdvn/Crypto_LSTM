@@ -8,6 +8,7 @@ def print_shape_describe_head(df, title=""):
 def print_shape(df, title=""):
     print("\n{}\n{}\n".format(title, df.shape))
 
+
 def visualize_results(series, labels, colors=None, title='Price prediction', block=True):
     plt.figure(figsize=(25, 15), dpi=80, facecolor='w', edgecolor='k')
     if not colors:
@@ -31,7 +32,6 @@ def visualize_results(series, labels, colors=None, title='Price prediction', blo
 
 def display_model_train_history(model_fit_history, block=True):
     print("Displaying model train history")
-    import matplotlib.pyplot as plt
 
     plt.plot(model_fit_history.history['loss'])
     plt.title('Model loss')

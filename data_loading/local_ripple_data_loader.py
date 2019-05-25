@@ -4,7 +4,7 @@ from sklearn.preprocessing import MinMaxScaler
 from utils.display_functions import print_shape_describe_head
 
 
-class RippleDataLoader:
+class LocalRippleDataLoader:
     def __init__(self, csv_path, test_set_size):
         self.__csv_path = csv_path
         self.__days_to_predict = test_set_size

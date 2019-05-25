@@ -1,8 +1,10 @@
 /.idea
 /datasets
-*.csv
 *.cfg
 
 /__pycache__
 *.pyc
 *.txt
+*.jpg
+*.png
+*.csv

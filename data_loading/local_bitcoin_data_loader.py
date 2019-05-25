@@ -4,7 +4,7 @@ from sklearn.preprocessing import MinMaxScaler
 from utils.display_functions import print_shape_describe_head, print_shape
 
 
-class BitcoinDataLoader:
+class LocalBitcoinDataLoader:
     def __init__(self, csv_path, test_set_size, sequence_length):
         """
         :param csv_path: path to data csv format
