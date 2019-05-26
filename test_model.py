@@ -40,7 +40,7 @@ def main(csv_data_file, model_file, days_to_predict, consecutive_predictions, pe
     else:
         actual_price = data_loader.reverse_min_max(data_loader.y_test)
         predicted_price = data_loader.reverse_min_max(y_predicted)
-        previous_price = data_loader.reverse_min_max(data_loader.y_train)
+        previous_price = data_loader.reverse_min_max(data_loader.y_train)[-100:]
         actual_price = np.concatenate((previous_price, actual_price))
         predicted_price = np.concatenate((previous_price, predicted_price))
         visualize_results((actual_price, predicted_price), labels=('actual BTC price', 'predicted BTC price'))

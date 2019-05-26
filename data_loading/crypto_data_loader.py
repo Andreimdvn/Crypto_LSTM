@@ -14,7 +14,7 @@ class CryptoDataLoader:
     Can load from URL or from local CSV file
     Produces train and test arrays
     """
-    def __init__(self, csv_source, days_to_predict, sequence_length, columns=None):
+    def __init__(self, csv_source, days_to_predict, sequence_length, columns=None, use_percentage=True):
         self.__sequence_length = sequence_length
         self.__days_to_predict = days_to_predict
         self.__data = self.__load_data(csv_source)
@@ -22,8 +22,13 @@ class CryptoDataLoader:
         self.__data = self.__data.dropna()
         self.__data = self.__filter_columns(columns)
         self.features = len(self.__data.columns)
-        self.__min_max_scaler = MinMaxScaler()
-        self.x_train, self.y_train, self.x_test, self.y_test = self.__create_sequences()
+        if use_percentage:
+            self.__min_max_scaler = MinMaxScaler(feature_range=(-1, 1))
+            self.__transform_price_to_percentage()
+            self.x_train, self.y_train, self.x_test, self.y_test = self.__create_sequences()
+        else:
+            self.__min_max_scaler = MinMaxScaler()
+            self.x_train, self.y_train, self.x_test, self.y_test = self.__create_sequences()
         self.log_data_shapes()
 
     def __load_data(self, csv_source):
@@ -39,6 +44,9 @@ class CryptoDataLoader:
             return pd.read_csv(csv_source)
         end = time.time()
         print("Loaded data in {} seconds".format(end - start))
+
+    def get_last_training_price(self):
+        return self.__data['price(USD)'][-self.__days_to_predict-1]
 
     def log_data_shapes(self):
         print("Data loaded:")
@@ -85,3 +93,10 @@ class CryptoDataLoader:
         if columns is None:
             columns = ['price(USD)']
         return self.__data[columns]
+
+    def __transform_price_to_percentage(self):
+        a = self.__data['price(USD)']
+        b = np.concatenate((np.array([a[0]]), a[:-1]))
+        percentages = a/b - 1
+        print("Created percentages from prices:", a[-10:], b[-10:], percentages[-10:])
+        self.__data['price(USD)'] = a

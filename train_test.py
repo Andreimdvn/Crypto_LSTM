@@ -29,9 +29,9 @@ def main(csv_data_file, days_to_predict, epochs, batch_size, lstm_units, sequenc
 
     if percentage_normalizer:
         actual_price = get_price_series_from_start_price_and_percentage(
-            data_loader.price_values[-data_loader.sequence_length - 1], data_loader.y_test)
+            data_loader.get_last_training_price(), data_loader.y_test)
         predicted_price = get_price_series_from_start_price_and_percentage(
-            data_loader.price_values[-data_loader.sequence_length - 1], y_predicted)
+            data_loader.get_last_training_price(), y_predicted)
         visualize_results((actual_price, predicted_price), labels=('actual BTC price', 'predicted BTC price'))
         visualize_results((data_loader.y_test, y_predicted), labels=('actual BTC percentage change',
                                                                      'predicted BTC percentage change'))
