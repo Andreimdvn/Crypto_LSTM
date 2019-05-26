@@ -27,7 +27,7 @@ class LstmModel:
         # model.add(LSTM(units=lstm_ouput_size, activation='sigmoid'))
         # model.add(Dropout(0.2))
         # model.add(LSTM(units=self.first_layer_units*2, activation='sigmoid', input_shape=(None, 1)))
-        model.add(Dense(units=lstm_ouput_size/2))
+        model.add(Dense(units=lstm_ouput_size))
         model.add(Dense(units=1))
         model.compile(optimizer='adam', loss='mean_squared_error')
         print(model.summary())
