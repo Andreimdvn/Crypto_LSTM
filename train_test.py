@@ -11,7 +11,7 @@ from utils.np_functions import get_price_series_from_start_price_and_percentage
 
 def main(csv_data_file, days_to_predict, epochs, batch_size, lstm_units, sequence_length, percentage_normalizer,
          output_file):
-
+    output_file = get_output_file_name(output_file, epochs, batch_size, sequence_length, days_to_predict, lstm_units)
     data_loader = data_loader_factory.get_data_loader(csv_data_file, days_to_predict, percentage_normalizer,
                                                       sequence_length)
     lstm_model = LstmModel()
@@ -61,19 +61,17 @@ def init_arg_parser():
     return parser.parse_args()
 
 
-def setup_output_file_name(args):
+def get_output_file_name(output_file, epochs, batch_size, sequence_length, days_to_predict, lstm_units):
     output_file_name = "{}_{}epochs_{}batch_{}sequence_{}predictdays_{}LSTMunits.cfg".\
-        format(args.output_file, args.epochs, args.batch_size, args.sequence_length, args.days_to_predict,
-               args.lstm_units)
+        format(output_file, epochs, batch_size, sequence_length, days_to_predict, lstm_units)
     if os.path.exists(output_file_name):
         print("File with name {} already exists!".format(output_file_name))
         sys.exit(1)
 
-    args.output_file = output_file_name
+    return output_file_name
 
 
 if __name__ == "__main__":
     args = init_arg_parser()
-    setup_output_file_name(args)
     main(args.csv_data_file, args.days_to_predict, int(args.epochs), int(args.batch_size), int(args.lstm_units),
          int(args.sequence_length), args.percentage, args.output_file)
