@@ -22,11 +22,12 @@ class LstmModel:
 
     def init_model(self, lstm_ouput_size, features):
         model = Sequential()
-        model.add(LSTM(units=lstm_ouput_size, activation='sigmoid', input_shape=(None, features), return_sequences=True))
-        model.add(Dropout(0.5))
-        model.add(LSTM(units=lstm_ouput_size, activation='sigmoid'))
-        model.add(Dropout(0.3))
+        model.add(LSTM(units=lstm_ouput_size, activation='tanh', input_shape=(None, features), dropout=0.3))
+        model.add(Dropout(0.2))
+        # model.add(LSTM(units=lstm_ouput_size, activation='sigmoid'))
+        # model.add(Dropout(0.2))
         # model.add(LSTM(units=self.first_layer_units*2, activation='sigmoid', input_shape=(None, 1)))
+        model.add(Dense(units=lstm_ouput_size/2))
         model.add(Dense(units=1))
         model.compile(optimizer='adam', loss='mean_squared_error')
         print(model.summary())
@@ -36,7 +37,7 @@ class LstmModel:
         # checkpoint = ModelCheckpoint(filepath=checkpoint_file_prefix + '_checkpoint-{epoch:02d}-{loss:.2f}.hdf5',
         #                              period=self.CHECKPOINT_DUMP_MODEL, verbose=1)
 
-        self.history = self.model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, shuffle=True)  # validation_split=0.1)
+        self.history = self.model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs)  # validation_split=0.1)
         keras.utils.print_summary(self.model)
         display_model_train_history(self.history, block=False)
 
