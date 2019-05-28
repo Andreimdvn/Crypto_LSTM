@@ -19,22 +19,24 @@ def main(csv_data_file, days_to_predict, epochs, batch_size, lstm_units, sequenc
     lstm_model.save_model(output_file)
     lstm_model.save_history_to_file("history_{}".format(output_file))
 
+
 def init_arg_parser():
     parser = argparse.ArgumentParser(description="Train and test a lstm model")
-    parser.add_argument('-f', dest='csv_data_file', help='Data file in csv format', type=str, required=True)
-    parser.add_argument('-d', dest='days_to_predict', help='Days to predict. Training set = last number of days',
+    parser.add_argument('-f', '--file_csv', dest='csv_data_file', help='Data file in csv format', type=str, required=True)
+    parser.add_argument('-d', '--days_to_predict', dest='days_to_predict', help='Days to predict. Training set = last number of days',
                         type=int, default=defaults.DEFAULT_DAYS_TO_PREDICT)
-    parser.add_argument('-e', dest='epochs', help='Number of epochs used at training', type=int,
+    parser.add_argument('-e', '--epochs', dest='epochs', help='Number of epochs used at training', type=int,
                         default=defaults.DEFAULT_EPOCHS_NUMBER)
-    parser.add_argument('-b', dest='batch_size', help='Batch size', type=int, default=defaults.DEFAULT_BATCH_SIZE)
+    parser.add_argument('-b', '--batch_size', dest='batch_size', help='Batch size', type=int,
+                        default=defaults.DEFAULT_BATCH_SIZE)
     parser.add_argument('-u', dest='lstm_units', help='size of the output of the LSTM', type=int,
                         default=defaults.LSTM_UNITS)
-    parser.add_argument('-s', dest='sequence_length', help='number of timestamps used for prediction', type=int,
-                        default=defaults.DEFAULT_SEQUENCE_LENGTH)
-    parser.add_argument('-p', dest='percentage', help='Will convert prices to percentage change', type=bool,
-                        default=False)
-    parser.add_argument('-o', dest='output_file', help='{prefix}_epochs_batch_sequence_predictdays_LSTMunits', type=str,
-                        default='TBD')
+    parser.add_argument('-s', '--sequence', dest='sequence_length', help='number of timestamps used for prediction',
+                        type=int, default=defaults.DEFAULT_SEQUENCE_LENGTH)
+    parser.add_argument('-p', '--percentage_prediction', dest='percentage',
+                        help='Will convert prices to percentage change', default=False,action='store_true')
+    parser.add_argument('-o', '--output_file', dest='output_file',
+                        help='{prefix}_epochs_batch_sequence_predictdays_LSTMunits', type=str, default='TBD')
 
     return parser.parse_args()
 
