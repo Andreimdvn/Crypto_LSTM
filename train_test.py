@@ -2,6 +2,8 @@ import argparse
 import sys
 import os
 
+import numpy as np
+
 from utils import defaults
 from data_loading import data_loader_factory
 from LSTM_model import LstmModel
@@ -27,18 +29,26 @@ def main(csv_data_file, days_to_predict, epochs, batch_size, lstm_units, sequenc
     y_predicted = lstm_model.test_model(data_loader.x_test)
     print(lstm_model.evaluate_model(data_loader.x_test, data_loader.y_test))
 
+    actual = data_loader.reverse_min_max(data_loader.y_test)
+    predicted = data_loader.reverse_min_max(y_predicted)
     if percentage_normalizer:
         actual_price = get_price_series_from_start_price_and_percentage(
-            data_loader.get_last_training_price(), data_loader.y_test)
+            data_loader.price_values[-data_loader.sequence_length - 1], actual)
         predicted_price = get_price_series_from_start_price_and_percentage(
-            data_loader.get_last_training_price(), y_predicted)
+            data_loader.price_values[-data_loader.sequence_length - 1], predicted)
+        previous_price = data_loader.data['price(USD)'].values[-280:-180]
+        previous_price = np.reshape(previous_price, (len(previous_price), 1))
+        print(previous_price.shape, actual.shape)
+        actual = np.concatenate((previous_price, actual))
+        predicted = np.concatenate((previous_price, predicted))
         visualize_results((actual_price, predicted_price), labels=('actual BTC price', 'predicted BTC price'))
-        visualize_results((data_loader.y_test, y_predicted), labels=('actual BTC percentage change',
-                                                                     'predicted BTC percentage change'))
+        visualize_results((actual, predicted), labels=('actual BTC percentage change',
+                                                       'predicted BTC percentage change'))
     else:
-        actual_price = data_loader.reverse_min_max(data_loader.y_test)
-        predicted_price = data_loader.reverse_min_max(y_predicted)
-        visualize_results((actual_price, predicted_price), labels=('actual BTC price', 'predicted BTC price'))
+        previous_price = data_loader.reverse_min_max(data_loader.y_train)[-100:]
+        actual = np.concatenate((previous_price, actual))
+        predicted = np.concatenate((previous_price, predicted))
+        visualize_results((actual, predicted), labels=('actual BTC price', 'predicted BTC price'))
 
 
 def init_arg_parser():

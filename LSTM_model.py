@@ -22,12 +22,13 @@ class LstmModel:
 
     def init_model(self, lstm_ouput_size, features):
         model = Sequential()
-        model.add(LSTM(units=lstm_ouput_size, activation='tanh', input_shape=(None, features), dropout=0.3))
-        model.add(Dropout(0.2))
-        # model.add(LSTM(units=lstm_ouput_size, activation='sigmoid'))
-        # model.add(Dropout(0.2))
-        # model.add(LSTM(units=self.first_layer_units*2, activation='sigmoid', input_shape=(None, 1)))
-        model.add(Dense(units=lstm_ouput_size))
+        model.add(LSTM(units=lstm_ouput_size, activation='tanh', input_shape=(None, features), return_sequences=True,
+                       dropout=0.2))
+        model.add(Dropout(0.15))
+        model.add(LSTM(units=lstm_ouput_size, activation='tanh', return_sequences=True))
+        model.add(Dropout(0.15))
+        model.add(LSTM(units=lstm_ouput_size, activation='tanh', input_shape=(None, 1)))
+        # model.add(Dense(units=lstm_ouput_size))
         model.add(Dense(units=1))
         model.compile(optimizer='adam', loss='mean_squared_error')
         print(model.summary())

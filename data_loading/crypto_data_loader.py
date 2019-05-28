@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 
-from utils.display_functions import print_shape
+from utils.display_functions import print_shape, visualize_results
 
 
 class CryptoDataLoader:
@@ -14,14 +14,14 @@ class CryptoDataLoader:
     Can load from URL or from local CSV file
     Produces train and test arrays
     """
-    def __init__(self, csv_source, days_to_predict, sequence_length, columns=None, use_percentage=True):
+    def __init__(self, csv_source, days_to_predict, sequence_length, use_percentage, columns=None):
         self.sequence_length = sequence_length
         self.__days_to_predict = days_to_predict
         self.data = self.__load_data(csv_source)
         print("Data Loaded: {}".format(self.data.describe()))
         self.data = self.data.dropna()
         self.data = self.__filter_columns(columns)
-        self.price_values = self.data['price(USD)'].values
+        self.price_values = np.copy(self.data['price(USD)'].values)
         self.features = len(self.data.columns)
         if use_percentage:
             self.__min_max_scaler = MinMaxScaler(feature_range=(-1, 1))
@@ -60,6 +60,13 @@ class CryptoDataLoader:
         return self.__min_max_scaler.inverse_transform(values)
 
     def __create_sequences(self):
+        # apply min max scaler
+        train = self.data['price(USD)'].values[:-self.__days_to_predict]
+        train = self.__min_max_scaler.fit_transform(np.reshape(train, (len(train), 1)))
+        test = self.data['price(USD)'].values[-self.__days_to_predict:]
+        test = self.__min_max_scaler.transform(np.reshape(test, (len(test), 1)))
+        self.data['price(USD)'] = np.concatenate((np.reshape(train, (len(train),)), np.reshape(test, (len(test),))))
+
         input_sequence = []
         output_sequence = []
         used_values = self.data.values
@@ -77,16 +84,18 @@ class CryptoDataLoader:
         y_train = np_output[:-self.__days_to_predict]
         y_test = np_output[-self.__days_to_predict:]
 
-        x_train = np.reshape(x_train, (len(x_train) * self.sequence_length, self.features))
-        x_test = np.reshape(x_test, (len(x_test) * self.sequence_length, self.features))
-
-        x_train = self.__min_max_scaler.fit_transform(x_train)
-        x_test = self.__min_max_scaler.transform(x_test)
-        y_train = self.__min_max_scaler.transform(y_train)
-        y_test = self.__min_max_scaler.transform(y_test)
-
-        x_train = np.reshape(x_train, (len(x_train) // self.sequence_length, self.sequence_length, self.features))
-        x_test = np.reshape(x_test, (len(x_test) // self.sequence_length, self.sequence_length, self.features))
+        # x_train = np.reshape(x_train, (len(x_train) * self.sequence_length, self.features))
+        # x_test = np.reshape(x_test, (len(x_test) * self.sequence_length, self.features))
+        #
+        # print(x_train.shape)
+        #
+        # x_train = self.__min_max_scaler.fit_transform(x_train)
+        # x_test = self.__min_max_scaler.transform(x_test)
+        # y_train = self.__min_max_scaler.transform(y_train)
+        # y_test = self.__min_max_scaler.transform(y_test)
+        #
+        # x_train = np.reshape(x_train, (len(x_train) // self.sequence_length, self.sequence_length, self.features))
+        # x_test = np.reshape(x_test, (len(x_test) // self.sequence_length, self.sequence_length, self.features))
 
         return x_train, y_train, x_test, y_test
 
@@ -100,4 +109,4 @@ class CryptoDataLoader:
         b = np.concatenate((np.array([a[0]]), a[:-1]))
         percentages = a/b - 1
         print("Created percentages from prices:", a[-10:], b[-10:], percentages[-10:])
-        self.data['price(USD)'] = a
+        self.data['price(USD)'] = percentages
