@@ -29,7 +29,7 @@ def init_arg_parser():
                         default=defaults.DEFAULT_EPOCHS_NUMBER)
     parser.add_argument('-b', '--batch_size', dest='batch_size', help='Batch size', type=int,
                         default=defaults.DEFAULT_BATCH_SIZE)
-    parser.add_argument('-u', dest='lstm_units', help='size of the output of the LSTM', type=int,
+    parser.add_argument('-u', dest='--lstm_units', help='size of the output of the LSTM', type=int,
                         default=defaults.LSTM_UNITS)
     parser.add_argument('-s', '--sequence', dest='sequence_length', help='number of timestamps used for prediction',
                         type=int, default=defaults.DEFAULT_SEQUENCE_LENGTH)
@@ -37,6 +37,7 @@ def init_arg_parser():
                         help='Will convert prices to percentage change', default=False,action='store_true')
     parser.add_argument('-o', '--output_file', dest='output_file',
                         help='{prefix}_epochs_batch_sequence_predictdays_LSTMunits', type=str, default='TBD')
+    parser.add_argument("-j", '--jobs-dir', help='jobs dir used for gcloud trainig', required=False)
 
     return parser.parse_args()
 
