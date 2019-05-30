@@ -1,6 +1,9 @@
 /.idea
 /datasets
 *.cfg
+*.tar.gz
+*.zip
+*.egg-info
 
 /__pycache__
 *.pyc

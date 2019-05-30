@@ -2,7 +2,7 @@ import argparse
 import sys
 import os
 
-from LSTM_model import LstmModel
+from model.LSTM_model import LstmModel
 from data_loading import data_loader_factory
 from utils import defaults
 

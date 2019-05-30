@@ -2,9 +2,9 @@ import argparse
 import numpy as np
 
 from data_loading import data_loader_factory
-from LSTM_model import LstmModel
+from model.LSTM_model import LstmModel
 from utils import defaults
-from utils.display_functions import visualize_results, print_shape
+from utils.display_functions import visualize_results
 from utils.np_functions import get_price_series_from_start_price_and_percentage
 
 

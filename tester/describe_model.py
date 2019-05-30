@@ -3,7 +3,7 @@ import sys
 
 import keras
 
-from LSTM_model import LstmModel
+from model.LSTM_model import LstmModel
 from utils.display_functions import display_model_train_history
 
 
