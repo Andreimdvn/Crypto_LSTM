@@ -2,9 +2,9 @@ import argparse
 import sys
 import os
 
-from utils import defaults
-from data_loading import data_loader_factory
 from LSTM_model import LstmModel
+from data_loading import data_loader_factory
+from utils import defaults
 
 
 def main(csv_data_file, days_to_predict, epochs, batch_size, lstm_units, sequence_length, percentage_normalizer,
