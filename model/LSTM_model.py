@@ -40,7 +40,7 @@ class LstmModel:
 
         self.history = self.model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs)  # validation_split=0.1)
         keras.utils.print_summary(self.model)
-        display_model_train_history(self.history, block=False)
+        # display_model_train_history(self.history, block=False)
 
     def test_model(self, x_test):
         return self.model.predict(x_test)
