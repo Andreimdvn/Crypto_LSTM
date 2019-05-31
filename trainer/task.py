@@ -9,8 +9,8 @@ from utils import defaults
 
 def main(csv_data_file, days_to_predict, epochs, batch_size, lstm_units, sequence_length, percentage_normalizer,
          output_file, job_dir):
-    output_file_name = get_output_file_name(output_file, epochs, batch_size, sequence_length, days_to_predict, lstm_units)
-    history_output_file = "history_{}".format(output_file_name)
+    output_file = get_output_file_name(output_file, epochs, batch_size, sequence_length, days_to_predict, lstm_units)
+    history_output_file = "history_{}".format(output_file)
 
     data_loader = data_loader_factory.get_data_loader(csv_data_file, days_to_predict, percentage_normalizer,
                                                       sequence_length)
@@ -29,8 +29,9 @@ def main(csv_data_file, days_to_predict, epochs, batch_size, lstm_units, sequenc
 def init_arg_parser():
     parser = argparse.ArgumentParser(description="Train and test a lstm model")
     parser.add_argument('-f', '--file_csv', dest='csv_data_file', help='Data file in csv format', type=str, required=True)
-    parser.add_argument('-d', '--days_to_predict', dest='days_to_predict', help='Days to predict. Training set = last number of days',
-                        type=int, default=defaults.DEFAULT_DAYS_TO_PREDICT)
+    parser.add_argument('-d', '--days_to_predict', dest='days_to_predict',
+                        help='Days to predict. Training set = last number of days', type=int,
+                        default=defaults.DEFAULT_DAYS_TO_PREDICT)
     parser.add_argument('-e', '--epochs', dest='epochs', help='Number of epochs used at training', type=int,
                         default=defaults.DEFAULT_EPOCHS_NUMBER)
     parser.add_argument('-b', '--batch_size', dest='batch_size', help='Batch size', type=int,
