@@ -25,7 +25,7 @@ def main(csv_data_file, days_to_predict, epochs, batch_size, lstm_units, sequenc
 
     lstm_model.train_model(data_loader.x_train, data_loader.y_train, epochs, batch_size)
     lstm_model.save_model(output_file)
-    lstm_model.save_history_to_file("history_{}".format(output_file))
+    lstm_model.save_history("history_{}".format(output_file))
     y_predicted = lstm_model.test_model(data_loader.x_test)
     print(lstm_model.evaluate_model(data_loader.x_test, data_loader.y_test))
 

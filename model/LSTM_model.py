@@ -7,6 +7,7 @@ from keras.layers import LSTM
 from tensorflow.python.lib.io import file_io
 
 from utils.display_functions import display_model_train_history
+from utils.gcloud_utils import copy_file_to_gcloud
 
 
 class LstmModel:
@@ -49,7 +50,14 @@ class LstmModel:
     def evaluate_model(self, x_test, y_test):
         return self.model.metrics_names, self.model.evaluate(x_test, y_test)
 
-    def save_history_to_file(self, history_file):
-        if not isinstance(history_file, file_io.FileIO):
-            history_file = open(history_file, 'wb')
+    def save_history(self, history_file):
+        history_file = open(history_file, 'wb')
         pickle.dump(self.history, history_file)
+
+    def save_model_gcloud(self, output_file, job_dir):
+        self.save_model(output_file)
+        copy_file_to_gcloud(output_file, job_dir, output_file)
+
+    def save_history_gcloud(self, history_output_file, job_dir):
+        self.save_history(history_output_file)
+        copy_file_to_gcloud(history_output_file, job_dir, history_output_file)
