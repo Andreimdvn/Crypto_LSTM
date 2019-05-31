@@ -65,6 +65,7 @@ class CryptoDataLoader:
         train = self.__min_max_scaler.fit_transform(np.reshape(train, (len(train), 1)))
         test = self.data['price(USD)'].values[-self.__days_to_predict:]
         test = self.__min_max_scaler.transform(np.reshape(test, (len(test), 1)))
+        previous_price_values = np.copy(self.data['price(USD)'].values)
         self.data['price(USD)'] = np.concatenate((np.reshape(train, (len(train),)), np.reshape(test, (len(test),))))
 
         input_sequence = []
@@ -96,7 +97,7 @@ class CryptoDataLoader:
         #
         # x_train = np.reshape(x_train, (len(x_train) // self.sequence_length, self.sequence_length, self.features))
         # x_test = np.reshape(x_test, (len(x_test) // self.sequence_length, self.sequence_length, self.features))
-
+        self.data['price(USD)'] = previous_price_values
         return x_train, y_train, x_test, y_test
 
     def __filter_columns(self, columns):

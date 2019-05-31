@@ -13,7 +13,7 @@ def print_shape(df, title=""):
 def visualize_results(series, labels, colors=None, title='Price prediction', block=True):
     plt.figure(figsize=(25, 15), dpi=80, facecolor='w', edgecolor='k')
     if not colors:
-        colors = ['red', 'black', 'blue', 'yellow'][:len(series)]
+        colors = ['blac', 'red', 'blue', 'yellow'][:len(series)]
     for one_series, label, color in zip(series, labels, colors):
         plt.plot(one_series, color=color, label=label)
         plt.plot(one_series, '+', color=color, label=label)
