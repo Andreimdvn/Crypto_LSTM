@@ -8,8 +8,11 @@ from utils import defaults
 
 
 def main(csv_data_file, days_to_predict, epochs, batch_size, lstm_units, sequence_length, percentage_normalizer,
-         output_file):
+         output_file, job_dir):
     output_file = get_output_file_name(output_file, epochs, batch_size, sequence_length, days_to_predict, lstm_units)
+    output_file = os.path.join(job_dir, output_file)
+    history_output_file = os.path.join(job_dir, "history_{}".format(output_file))
+    
     data_loader = data_loader_factory.get_data_loader(csv_data_file, days_to_predict, percentage_normalizer,
                                                       sequence_length)
     lstm_model = LstmModel()
@@ -17,7 +20,7 @@ def main(csv_data_file, days_to_predict, epochs, batch_size, lstm_units, sequenc
 
     lstm_model.train_model(data_loader.x_train, data_loader.y_train, epochs, batch_size)
     lstm_model.save_model(output_file)
-    lstm_model.save_history_to_file("history_{}".format(output_file))
+    lstm_model.save_history_to_file("history_{}".format(history_output_file))
 
 
 def init_arg_parser():
@@ -37,7 +40,8 @@ def init_arg_parser():
                         help='Will convert prices to percentage change', default=False,action='store_true')
     parser.add_argument('-o', '--output_file', dest='output_file',
                         help='{prefix}_epochs_batch_sequence_predictdays_LSTMunits', type=str, default='TBD')
-    parser.add_argument("-j", '--job-dir', dest='--job_dir', help='jobs dir used for gcloud trainig', required=False)
+    parser.add_argument("-j", '--job-dir', dest='job_dir', help='jobs dir used for gcloud trainig', required=False,
+                        default='')
 
     return parser.parse_args()
 
@@ -55,4 +59,4 @@ def get_output_file_name(output_file, epochs, batch_size, sequence_length, days_
 if __name__ == "__main__":
     args = init_arg_parser()
     main(args.csv_data_file, args.days_to_predict, int(args.epochs), int(args.batch_size), int(args.lstm_units),
-         int(args.sequence_length), args.percentage, args.output_file)
+         int(args.sequence_length), args.percentage, args.output_file, args.job_dir)
