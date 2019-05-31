@@ -4,6 +4,7 @@ import keras
 from keras.models import Sequential
 from keras.layers import Dense, Dropout
 from keras.layers import LSTM
+from tensorflow.python.lib.io import file_io
 
 from utils.display_functions import display_model_train_history
 
@@ -49,5 +50,6 @@ class LstmModel:
         return self.model.metrics_names, self.model.evaluate(x_test, y_test)
 
     def save_history_to_file(self, history_file):
-        out_file = open(history_file, 'wb')
-        pickle.dump(self.history, out_file)
+        if not isinstance(history_file, file_io.FileIO):
+            history_file = open(history_file, 'wb')
+        pickle.dump(self.history, history_file)

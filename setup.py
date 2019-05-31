@@ -1,7 +1,8 @@
 from setuptools import find_packages
 from setuptools import setup
 
-REQUIRED_PACKAGES = ['matplotlib', 'pandas', 'numpy', 'datapackage', 'keras', 'sklearn']
+# REQUIRED_PACKAGES = ['tensorflow, matplotlib', 'pandas', 'numpy', 'datapackage', 'keras', 'sklearn']
+REQUIRED_PACKAGES = []
 
 setup(
     name='trainer',
