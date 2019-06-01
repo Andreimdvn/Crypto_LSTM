@@ -85,18 +85,6 @@ class CryptoDataLoader:
         y_train = np_output[:-self.__days_to_predict]
         y_test = np_output[-self.__days_to_predict:]
 
-        # x_train = np.reshape(x_train, (len(x_train) * self.sequence_length, self.features))
-        # x_test = np.reshape(x_test, (len(x_test) * self.sequence_length, self.features))
-        #
-        # print(x_train.shape)
-        #
-        # x_train = self.__min_max_scaler.fit_transform(x_train)
-        # x_test = self.__min_max_scaler.transform(x_test)
-        # y_train = self.__min_max_scaler.transform(y_train)
-        # y_test = self.__min_max_scaler.transform(y_test)
-        #
-        # x_train = np.reshape(x_train, (len(x_train) // self.sequence_length, self.sequence_length, self.features))
-        # x_test = np.reshape(x_test, (len(x_test) // self.sequence_length, self.sequence_length, self.features))
         self.data['price(USD)'] = previous_price_values
         return x_train, y_train, x_test, y_test
 

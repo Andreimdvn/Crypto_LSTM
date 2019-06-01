@@ -4,7 +4,8 @@ import numpy as np
 from data_loading import data_loader_factory
 from model.LSTM_model import LstmModel
 from utils import defaults
-from utils.display_functions import visualize_results
+from utils.display_functions import visualize_results, display_plots_with_single_prediction
+from utils.metrics import get_binary_accuracy_from_price_prediction
 from utils.np_functions import get_price_series_from_start_price_and_percentage
 
 
@@ -43,30 +44,41 @@ def main(csv_data_file, model_file, days_to_predict, consecutive_predictions, pe
         previous_price = np.reshape(previous_price, (len(previous_price), 1))
         actual = np.concatenate((previous_price, actual))
         predicted = np.concatenate((previous_price, predicted))
-        visualize_results((actual_price, predicted_price), labels=('actual BTC price', 'predicted BTC price'))
+        visualize_results((actual_price, predicted_price), labels=('actual BTC price', 'predicted BTC price'), block=False)
         visualize_results((actual, predicted), labels=('actual BTC percentage change',
-                                                       'predicted BTC percentage change'))
+                                                       'predicted BTC percentage change'), block=False)
     else:
         previous_price = data_loader.reverse_min_max(data_loader.y_train)[-100:]
-        actual = np.concatenate((previous_price, actual))
-        predicted = np.concatenate((previous_price, predicted))
-        visualize_results((actual, predicted), labels=('actual BTC price', 'predicted BTC price'))
+        actual_price = np.concatenate((previous_price, actual))
+        predicted_price = np.concatenate((previous_price, predicted))
+        visualize_results((actual_price, predicted_price), labels=('actual BTC price', 'predicted BTC price'))
+
+    if not consecutive_predictions:  # plot sample of prediction vs actual in multiple subplots
+        reshaped_x_test = np.reshape(data_loader.x_test, (len(data_loader.x_test), data_loader.x_test.shape[1] * data_loader.x_test.shape[2]))
+        actual_price_input = data_loader.reverse_min_max(reshaped_x_test)
+        actual_price_input = np.reshape(actual_price_input, data_loader.x_test.shape)
+        print("Binary Accuracy: {}".format(get_binary_accuracy_from_price_prediction(actual_price_input, actual,
+                                                                                     predicted)))
+        display_plots_with_single_prediction(actual_price_input, actual, predicted)
+    input()
 
 
 def init_arg_parser():
     parser = argparse.ArgumentParser(description="Describe model and test it")
-    parser.add_argument('-f', '--file_csv', dest='csv_data_file', help='Data file in csv format', type=str,
-                        required=True)
-    parser.add_argument('-m', '--model_file', dest='model_file', help='LSTM Keras model export file', type=str, required=True)
+    parser.add_argument('-f', '--file_csv', dest='csv_data_file', help='Data file in csv format',
+                        type=str, required=True)
+    parser.add_argument('-m', '--model_file', dest='model_file', help='LSTM Keras model export file',
+                        type=str, required=True)
     parser.add_argument('-d', '--days_to_predict', dest='days_to_predict',
                         help='Days to predict. Training set = last number of days',
                         type=int, default=defaults.DEFAULT_DAYS_TO_PREDICT)
     parser.add_argument('-c', '--consecutive_prediction', dest='consecutive_prediction',
                         help='Will predict based on previous predicted price not on real previous price.',
-                        type=bool, default=False)
-    parser.add_argument('-p', '--percentage_prediction', dest='percentage',
+                        default=False, action='store_true')
+    parser.add_argument('-p', '--percentage_prediction', dest='percentage_prediction',
                         help='Will convert prices to percentage change', default=False, action='store_true')
-    parser.add_argument('-s', '--sequence', dest='sequence_length', help='number of timestamps used for prediction',
+    parser.add_argument('-s', '--sequence_length', dest='sequence_length',
+                        help='number of timestamps used for prediction',
                         type=int, default=defaults.DEFAULT_SEQUENCE_LENGTH)
 
     return parser.parse_args()
@@ -75,4 +87,4 @@ def init_arg_parser():
 if __name__ == "__main__":
     args = init_arg_parser()
     main(args.csv_data_file, args.model_file, int(args.days_to_predict), args.consecutive_prediction,
-         args.percentage, args.sequence_length)
+         args.percentage_prediction, args.sequence_length)
