@@ -56,7 +56,7 @@ def init_arg_parser():
     parser.add_argument('-o', '--output_file', dest='output_file',
                         help='{prefix}_epochs_batch_sequence_predictdays_LSTMunits_layers_drop_lr.cfg', type=str,
                         default='None')
-    parser.add_argument('-e', '--early_stop', dest='early_stop',
+    parser.add_argument('-E', '--early_stop', dest='early_stop',
                         help='Stop the training after 10 epochs if val_loss has not improved', default=False,
                         action='store_true')
     parser.add_argument("-j", '--job-dir', dest='job_dir', help='jobs dir used for gcloud training', required=False,
