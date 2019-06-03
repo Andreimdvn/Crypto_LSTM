@@ -1,0 +1,19 @@
+gcloud ai-platform jobs submit training $JOB_NAME \
+        --scale-tier basic \
+		--package-path /home/moldovanndrei/Crypto_LSTM/trainer \
+        --module-name $MAIN_TRAINER_MODULE \
+        --job-dir $JOB_DIR \
+        --region $REGION \
+        --runtime-version $RUNTIME_VERSION \
+        --python-version $PYTHON_VERSION \
+        -- \
+        --file_csv=https://datahub.io/cryptocurrency/bitcoin/datapackage.json \
+        --days_to_predict=100 \
+        --epochs=200 \
+        --batch_size=16 \
+        --lstm_units=32 \
+        --number_of_layers=1 \
+        --dropout_rate=0.2 \
+        --learning_rate=0.001 \
+        --sequence_length=30 \
+        --output_file=best_price_model
