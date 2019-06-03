@@ -1,10 +1,11 @@
---file_csv=https://datahub.io/cryptocurrency/bitcoin/datapackage.json
+--file_csv=datahub/bitcoin_datahub.csv
 --days_to_predict=100
 --epochs=100
---batch_size=16
---lstm_units=32
+--batch_size=64
+--lstm_units=16
 --number_of_layers=1
---dropout_rate=0.2
---learning_rate=0.001
+--dropout_rate=0.5
+--learning_rate=0.01
 --sequence_length=30
---output_file=trash
+--output_file=percent
+--percentage

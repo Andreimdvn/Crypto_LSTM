@@ -9,19 +9,19 @@ from keras.optimizers import Adam
 from utils.gcloud_utils import copy_file_to_gcloud
 
 
-class LstmModel:
+class LstmClassModel:
     def __init__(self):
         self.model = None
         self.history = None
 
-    def load_from_file(self, file_path):
+    def loadl_from_file(self, file_path):
         self.model = keras.models.load_model(file_path)
 
     def save_model(self, model_config_file):
         print("Saving model to file {}".format(model_config_file))
         self.model.save(model_config_file)
 
-    def init_model(self, lstm_units, number_of_layers, dropout_rate, features, learning_rate):
+    def init_model(self, lstm_units, number_of_layers, dropout_rate, features, learning_rate, classes):
         model = Sequential()
         if number_of_layers == 1:
             model.add(LSTM(units=lstm_units, activation='tanh', input_shape=(None, features)))
@@ -39,8 +39,8 @@ class LstmModel:
             model.add(LSTM(units=lstm_units, activation='tanh'))
             model.add(Dropout(dropout_rate))
 
-        model.add(Dense(units=1))
-        model.compile(optimizer=Adam(lr=learning_rate), loss='mean_squared_error')
+        model.add(Dense(1, activation='sigmoid'))
+        model.compile(loss='binary_crossentropy', optimizer=Adam(lr=learning_rate), metrics=['accuracy'])
         print(model.summary())
         self.model = model
 
@@ -48,12 +48,13 @@ class LstmModel:
         # checkpoint = ModelCheckpoint(filepath=checkpoint_file_prefix + '_checkpoint-{epoch:02d}-{loss:.2f}.hdf5',
         #                              period=self.CHECKPOINT_DUMP_MODEL, verbose=1)
         if use_early_stop:
-            es = keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0, patience=10, verbose=0, mode='auto',
+            es = keras.callbacks.EarlyStopping(monitor='val_acc', min_delta=0, patience=10, verbose=0, mode='auto',
                                                restore_best_weights=True)
             self.history = self.model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs,  validation_split=0.1,
-                                          callbacks=[es])
+                                          callbacks=[es], shuffle=True)
         else:
-            self.history = self.model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, validation_split=0.1)
+            self.history = self.model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, validation_split=0.1,
+                                          shuffle=True)
         keras.utils.print_summary(self.model)
 
     def test_model(self, x_test):

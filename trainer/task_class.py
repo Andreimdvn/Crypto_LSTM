@@ -1,7 +1,7 @@
 import argparse
 
-from model.LSTM_model import LstmModel
 from data_loading import data_loader_factory
+from model.LSTM_class_model import LstmClassModel
 from utils import defaults
 from utils.format_functions import get_output_file_name
 
@@ -13,9 +13,10 @@ def main(csv_data_file, days_to_predict, epochs, batch_size, lstm_units, sequenc
     history_output_file = "history_{}".format(output_file)
 
     data_loader = data_loader_factory.get_data_loader(csv_data_file, days_to_predict, percentage_normalizer,
-                                                      sequence_length)
-    lstm_model = LstmModel()
-    lstm_model.init_model(lstm_units, number_of_layers, dropout_rate, data_loader.features, learning_rate)
+                                                      sequence_length, classification_output=True)
+    lstm_model = LstmClassModel()
+    lstm_model.init_model(lstm_units, number_of_layers, dropout_rate, data_loader.features, learning_rate,
+                          len(data_loader.CLASSES))
 
     lstm_model.train_model(data_loader.x_train, data_loader.y_train, epochs, batch_size, use_early_stop)
     if job_dir:

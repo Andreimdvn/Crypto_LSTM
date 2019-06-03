@@ -7,7 +7,7 @@ def print_shape_describe_head(df, title=""):
 
 def print_shape(df, title=""):
     print("\n{}\n{}\n".format(title, df.shape))
-    print("[0]: {}\n[1]: {}".format(df[0][:5], df[1][:5]))
+    print("[0]: {}\n[1]: {}\n[-1]: {}".format(df[0], df[1], df[-1]))
 
 
 def visualize_results(series, labels, colors=None, title='Price prediction', block=True):
