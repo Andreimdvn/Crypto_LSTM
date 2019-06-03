@@ -74,7 +74,7 @@ def main(csv_data_file, days_to_predict, epochs, job_dir, iterations, percentage
 
         print("New parameters output: {}".format(parameters))
         results.append(parameters)
-        if nr_iter % 2 == 0:
+        if nr_iter % 10 == 0:
             df = pd.DataFrame.from_dict(results)
             partial_output = "{}_{}.cfg".format(results_output_file.replace(".", '_'), nr_iter)
             df.to_csv(partial_output)
