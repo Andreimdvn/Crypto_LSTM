@@ -42,14 +42,19 @@ def main(csv_data_file, days_to_predict, epochs, job_dir, iterations, percentage
         used_params.append(parameters.copy())
         output_file = 'model_{}'.format(nr_iter)
         start_time = time.time()
-        model_history = train_main(csv_data_file, days_to_predict=days_to_predict, epochs=epochs,
-                                   batch_size=parameters['batch_size'], lstm_units=parameters['lstm_units'],
+        model_history = train_main(csv_data_file,
+                                   days_to_predict=days_to_predict,
+                                   epochs=epochs,
+                                   batch_size=parameters['batch_size'],
+                                   lstm_units=parameters['lstm_units'],
                                    sequence_length=parameters['sequence_length'],
                                    number_of_layers=parameters['number_of_layers'],
                                    dropout_rate=parameters['dropout_rate'],
                                    learning_rate=parameters['learning_rate'],
                                    percentage_normalizer=percentage_normalizer,
-                                   output_file=output_file, job_dir=job_dir)
+                                   output_file=output_file,
+                                   use_early_stop=True,
+                                   job_dir=job_dir)
         end_time = time.time()
         parameters['loss'] = model_history.history['loss'][-1]
         parameters['val_loss'] = model_history.history['val_loss'][-1]

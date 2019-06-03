@@ -8,7 +8,7 @@ from utils.format_functions import get_output_file_name
 
 
 def main(csv_data_file, days_to_predict, epochs, batch_size, lstm_units, sequence_length, number_of_layers,
-         dropout_rate, learning_rate, percentage_normalizer, output_file, job_dir):
+         dropout_rate, learning_rate, percentage_normalizer, output_file, use_early_stop, job_dir):
     output_file = get_output_file_name(output_file, days_to_predict, epochs, batch_size, lstm_units, sequence_length,
                                        number_of_layers, dropout_rate, learning_rate, percentage_normalizer)
     history_output_file = "history_{}".format(output_file)
@@ -18,7 +18,7 @@ def main(csv_data_file, days_to_predict, epochs, batch_size, lstm_units, sequenc
     lstm_model = LstmModel()
     lstm_model.init_model(lstm_units, number_of_layers, dropout_rate, data_loader.features, learning_rate)
 
-    lstm_model.train_model(data_loader.x_train, data_loader.y_train, epochs, batch_size)
+    lstm_model.train_model(data_loader.x_train, data_loader.y_train, epochs, batch_size, use_early_stop)
     if job_dir:
         lstm_model.save_model_gcloud(output_file, job_dir)
         lstm_model.save_history_gcloud(history_output_file, job_dir)
@@ -56,6 +56,9 @@ def init_arg_parser():
     parser.add_argument('-o', '--output_file', dest='output_file',
                         help='{prefix}_epochs_batch_sequence_predictdays_LSTMunits_layers_drop_lr.cfg', type=str,
                         default='None')
+    parser.add_argument('-e', '--early_stop', dest='early_stop',
+                        help='Stop the training after 10 epochs if val_loss has not improved', default=False,
+                        action='store_true')
     parser.add_argument("-j", '--job-dir', dest='job_dir', help='jobs dir used for gcloud training', required=False,
                         default=None)
 
@@ -67,4 +70,4 @@ if __name__ == "__main__":
     print(args.__dict__)
     main(args.csv_data_file, args.days_to_predict, int(args.epochs), int(args.batch_size), int(args.lstm_units),
          int(args.sequence_length), int(args.number_of_layers), float(args.dropout_rate), float(args.learning_rate),
-         args.percentage, args.output_file, args.job_dir)
+         args.percentage, args.output_file, args.early_stop, args.job_dir)

@@ -45,14 +45,16 @@ class LstmModel:
         print(model.summary())
         self.model = model
 
-    def train_model(self, x_train, y_train, epochs, batch_size):
+    def train_model(self, x_train, y_train, epochs, batch_size, use_early_stop=False):
         # checkpoint = ModelCheckpoint(filepath=checkpoint_file_prefix + '_checkpoint-{epoch:02d}-{loss:.2f}.hdf5',
         #                              period=self.CHECKPOINT_DUMP_MODEL, verbose=1)
-        es = keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0, patience=10, verbose=0, mode='auto',
-                                           restore_best_weights=True)
-
-        self.history = self.model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs,  validation_split=0.1,
-                                      callbacks=[es])
+        if use_early_stop:
+            es = keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0, patience=10, verbose=0, mode='auto',
+                                               restore_best_weights=True)
+            self.history = self.model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs,  validation_split=0.1,
+                                          callbacks=[es])
+        else:
+            self.history = self.model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, validation_split=0.1)
         keras.utils.print_summary(self.model)
 
     def test_model(self, x_test):
