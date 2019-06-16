@@ -9,12 +9,18 @@ from utils import defaults
 
 from utils.gcloud_utils import copy_file_to_gcloud
 
-lstm_units = [16, 32, 64, 100]
-number_of_layers = [1, 2, 3]
-dropout_rate = np.linspace(0, 0.5, 11)
+# lstm_units = [16, 32, 64, 100]
+lstm_units = [32, 64]
+# number_of_layers = [1, 2, 3]
+number_of_layers = [1]
+# dropout_rate = np.linspace(0, 0.5, 11)
+dropout_rate = np.linspace(0, 0.25, 6)
 learning_rate = [0.001, 0.005, 0.01]
-batch_size = [1, 4, 8, 16, 32]
-sequence_length = [30, 40, 50, 60, 80, 100]
+# batch_size = [1, 4, 8, 16, 32]
+batch_size = [16]
+# sequence_length = [30, 40, 50, 60, 80, 100]
+sequence_length = [10, 15, 20, 30, 40]
+decay_rate = [0.01, 0.05, 0.005]
 
 
 def get_parameters(used_params, parameters):
@@ -26,14 +32,14 @@ def get_parameters(used_params, parameters):
             return new_choice
 
 
-def main(csv_data_file, days_to_predict, epochs, job_dir, iterations, percentage_normalizer, results_output_file,
-         prefix_models, classification_model):
+def main(csv_data_file, days_to_predict, epochs, job_dir, iterations, percentage_normalizer, relative_price_change,
+         results_output_file, prefix_models, classification_model):
     parameters_choice = dict(lstm_units=lstm_units,
                              number_of_layers=number_of_layers,
                              dropout_rate=dropout_rate,
                              learning_rate=learning_rate,
                              batch_size=batch_size,
-                             sequence_length=sequence_length)
+                             sequence_length=sequence_length, decay_rate=decay_rate)
 
     if classification_model:
         from trainer.task_class import main as train_main
@@ -44,7 +50,7 @@ def main(csv_data_file, days_to_predict, epochs, job_dir, iterations, percentage
     used_params = []
     for nr_iter in range(iterations):
         parameters = get_parameters(used_params, parameters_choice)
-        print("New parameters: {}".format(parameters))
+        print("Iteration {}. New parameters: {}".format(nr_iter, parameters))
         used_params.append(parameters.copy())
         output_file = '{}_model_{}'.format(prefix_models, nr_iter)
         start_time = time.time()
@@ -59,8 +65,10 @@ def main(csv_data_file, days_to_predict, epochs, job_dir, iterations, percentage
                                    dropout_rate=parameters['dropout_rate'],
                                    learning_rate=parameters['learning_rate'],
                                    percentage_normalizer=percentage_normalizer,
+                                   relative_price_change=relative_price_change,
                                    output_file=output_file,
                                    use_early_stop=True,
+                                   decay_rate=parameters['decay_rate'],
                                    job_dir=job_dir)
         end_time = time.time()
         parameters['loss'] = model_history.history['loss'][-1]
@@ -104,6 +112,9 @@ def init_arg_parser():
                         help='Will convert prices to percentage change', default=False, action='store_true')
     parser.add_argument('-P', '--prefix_models', dest='prefix_models',
                         help='prefix for model name = tuning instance name', default="", type=str)
+    parser.add_argument('-R', '--relative_price_change', dest='relative_price_change',
+                        help='Will convert prices to relative percentage change to the beginning of the sequence',
+                        default=False, action='store_true')
     parser.add_argument('-o', '--output_file', dest='output_file', help='output file for results of the random search')
     parser.add_argument('-c', '--classification_model', dest='classification_model',
                         help='Use classification model', default=False, action='store_true')
@@ -115,4 +126,4 @@ if __name__ == '__main__':
     args = init_arg_parser()
     print(args.__dict__)
     main(args.csv_data_file, int(args.days_to_predict), int(args.epochs), args.job_dir, int(args.iterations),
-         args.percentage, args.output_file, args.prefix_models, args.classification_model)
+         args.percentage, args.relative_price_change, args.output_file, args.prefix_models, args.classification_model)

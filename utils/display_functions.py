@@ -10,6 +10,15 @@ def print_shape(df, title=""):
     print("[0]: {}\n[1]: {}\n[-1]: {}".format(df[0], df[1], df[-1]))
 
 
+def plot_result_lines(actual, predicted, block=False):
+    plt.figure()
+    for y1, y2, x in zip(actual, predicted, range(len(actual))):
+        plt.vlines(x, ymin=y1, ymax=y2, colors='red')
+    plt.plot(actual, color='black', label='actual price')
+    plt.title('Actual-Predicted diff', fontsize=30)
+    plt.show(block=block)
+
+
 def visualize_results(series, labels, colors=None, title='Price prediction', block=True):
     plt.figure(figsize=(25, 15), dpi=80, facecolor='w', edgecolor='k')
     if not colors:
@@ -31,14 +40,26 @@ def visualize_results(series, labels, colors=None, title='Price prediction', blo
     plt.show(block=block)
 
 
-def display_model_train_history(model_fit_history, block=True):
-    print("Displaying model train history")
+def display_model_train_history_loss(model_fit_history, block=True):
+    print("Displaying model train loss history")
 
     plt.plot(model_fit_history.history['val_loss'], label='validation loss')
     plt.plot(model_fit_history.history['loss'], label='training loss')
     plt.legend(loc=1, prop={'size': 25})
     plt.title('Model loss')
     plt.ylabel('Loss')
+    plt.xlabel('Epoch')
+    plt.show(block=block)
+
+
+def display_model_train_history_acc(model_fit_history, block=True):
+    print("Displaying model train acc history")
+
+    plt.plot(model_fit_history.history['val_acc'], label='validation acc')
+    plt.plot(model_fit_history.history['acc'], label='training acc')
+    plt.legend(loc=1, prop={'size': 25})
+    plt.title('Model acc')
+    plt.ylabel('acc')
     plt.xlabel('Epoch')
     plt.show(block=block)
 
@@ -76,3 +97,13 @@ def display_plots_with_single_prediction(input_prices, actual_price, predicted_p
     # axarr[1, 0].set_title('Axis [1,0]')
     # axarr[1, 1].scatter(x, y ** 2)
     # axarr[1, 1].set_title('Axis [1,1]')
+
+
+def display_confusion_matrix(conf_matrix):
+    tn, fp, fn, tp = conf_matrix
+    print('\npositive = price will go down')
+    print("Total samples: {}".format(tn + tp + fp + fn))
+    print("True negatives: {}".format(tn))
+    print("True positives: {}".format(tp))
+    print("False positives: {}".format(fp))
+    print("False negatives: {}".format(fn))

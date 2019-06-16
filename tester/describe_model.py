@@ -4,7 +4,7 @@ import sys
 import keras
 
 from model.LSTM_model import LstmModel
-from utils.display_functions import display_model_train_history
+from utils.display_functions import display_model_train_history_loss, display_model_train_history_acc
 
 
 def main(model_file_path, history_file_path):
@@ -17,7 +17,9 @@ def main(model_file_path, history_file_path):
     print("Epochs: {}".format(len(model_fit_history.history['loss'])))
     print("Loss:")
     print(model_fit_history.history['loss'])
-    display_model_train_history(model_fit_history)
+    display_model_train_history_loss(model_fit_history)
+    if 'acc' in model_fit_history.history:
+        display_model_train_history_acc(model_fit_history)
 
 
 if __name__ == '__main__':

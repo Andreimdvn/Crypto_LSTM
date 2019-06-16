@@ -12,5 +12,5 @@ gcloud ai-platform jobs submit training $JOB_NAME \
         --epochs=200 \
         --iterations=50 \
         --output_file=percent_tunning_results.cfg \
-        --percentage_prediction \
+        --classification_model \
         --prefix_models=percent

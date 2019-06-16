@@ -7,15 +7,16 @@ from utils.format_functions import get_output_file_name
 
 
 def main(csv_data_file, days_to_predict, epochs, batch_size, lstm_units, sequence_length, number_of_layers,
-         dropout_rate, learning_rate, percentage_normalizer, output_file, use_early_stop, job_dir):
+         dropout_rate, learning_rate, percentage_normalizer, relative_price_change, output_file, use_early_stop,
+         decay_rate, job_dir):
     output_file = get_output_file_name(output_file, days_to_predict, epochs, batch_size, lstm_units, sequence_length,
-                                       number_of_layers, dropout_rate, learning_rate, percentage_normalizer)
+                                       number_of_layers, dropout_rate, learning_rate, percentage_normalizer, decay_rate)
     history_output_file = "history_{}".format(output_file)
 
     data_loader = data_loader_factory.get_data_loader(csv_data_file, days_to_predict, percentage_normalizer,
-                                                      sequence_length)
+                                                      sequence_length, relative_price_change=relative_price_change)
     lstm_model = LstmModel()
-    lstm_model.init_model(lstm_units, number_of_layers, dropout_rate, data_loader.features, learning_rate)
+    lstm_model.init_model(lstm_units, number_of_layers, dropout_rate, data_loader.features, learning_rate, decay_rate)
 
     lstm_model.train_model(data_loader.x_train, data_loader.y_train, epochs, batch_size, use_early_stop)
     if job_dir:
@@ -51,6 +52,9 @@ def init_arg_parser():
                         type=float, default=defaults.DEFAULT_LEARNING_RATE)
     parser.add_argument('-p', '--percentage_prediction', dest='percentage',
                         help='Will convert prices to percentage change', default=False, action='store_true')
+    parser.add_argument('-R', '--relative_price_change', dest='relative_price_change',
+                        help='Will convert prices to relative percentage change to the beginning of the sequence',
+                        default=False, action='store_true')
     parser.add_argument('-o', '--output_file', dest='output_file',
                         help='{prefix}_epochs_batch_sequence_predictdays_LSTMunits_layers_drop_lr.cfg', type=str,
                         default='None')
@@ -59,6 +63,8 @@ def init_arg_parser():
                         action='store_true')
     parser.add_argument("-j", '--job-dir', dest='job_dir', help='jobs dir used for gcloud training', required=False,
                         default=None)
+    parser.add_argument('-D', '--decay_rate', dest='decay_rate', help='decay rate of the adam optimizer',
+                        type=float, default=defaults.DEFAULT_DECAY_RATE)
 
     return parser.parse_args()
 
@@ -68,4 +74,4 @@ if __name__ == "__main__":
     print(args.__dict__)
     main(args.csv_data_file, args.days_to_predict, int(args.epochs), int(args.batch_size), int(args.lstm_units),
          int(args.sequence_length), int(args.number_of_layers), float(args.dropout_rate), float(args.learning_rate),
-         args.percentage, args.output_file, args.early_stop, args.job_dir)
+         args.percentage, args.relative_price_change, args.output_file, args.early_stop, args.decay_rate, args.job_dir)

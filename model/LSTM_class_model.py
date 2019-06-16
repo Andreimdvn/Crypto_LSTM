@@ -14,7 +14,7 @@ class LstmClassModel:
         self.model = None
         self.history = None
 
-    def loadl_from_file(self, file_path):
+    def load_from_file(self, file_path):
         self.model = keras.models.load_model(file_path)
 
     def save_model(self, model_config_file):

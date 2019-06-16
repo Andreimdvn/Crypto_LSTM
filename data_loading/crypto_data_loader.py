@@ -6,6 +6,7 @@ from sklearn.preprocessing import MinMaxScaler
 
 from utils.display_functions import print_shape
 
+
 class CryptoDataLoader:
     """
     Used to load data for any cryptocurrency
@@ -13,7 +14,8 @@ class CryptoDataLoader:
     Can load from URL or from local CSV file
     Produces train and test arrays
     """
-    def __init__(self, csv_source, days_to_predict, sequence_length, use_percentage, columns=None):
+    def __init__(self, csv_source, days_to_predict, sequence_length, use_percentage, relative_price_change,
+                 columns=None):
         self.sequence_length = sequence_length
         self.__days_to_predict = days_to_predict
         self.data = self.__load_data(csv_source)
@@ -22,13 +24,14 @@ class CryptoDataLoader:
         self.data = self.__filter_columns(columns)
         self.price_values = np.copy(self.data['price(USD)'].values)
         self.features = len(self.data.columns)
+        self.__min_max_scaler = MinMaxScaler()
         if use_percentage:
-            self.__min_max_scaler = MinMaxScaler()
             self.__transform_price_to_percentage()
-            self.x_train, self.y_train, self.x_test, self.y_test = self.__create_sequences()
+        if relative_price_change:
+            self.x_train, self.y_train, self.x_test, self.y_test = self.__create_relative_price_change_sequences()
         else:
-            self.__min_max_scaler = MinMaxScaler()
             self.x_train, self.y_train, self.x_test, self.y_test = self.__create_sequences()
+
         self.log_data_shapes()
 
     def __load_data(self, csv_source):
@@ -90,3 +93,12 @@ class CryptoDataLoader:
         percentages = a/b - 1
         print("Created percentages from prices:", a[-10:], b[-10:], percentages[-10:])
         self.data['price(USD)'] = percentages
+
+    def __create_relative_price_change_sequences(self):
+        values = self.data['price(USD)'].values
+        sequences = [values[i: i + self.sequence_length + 1] / values[i-1] - 1
+                     for i in range(1, len(values) - self.sequence_length)]
+        input_sequences = [seq[:-1] for seq in sequences]
+        output_sequences = [seq[-1] for seq in sequences]
+
+
