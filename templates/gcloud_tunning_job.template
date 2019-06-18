@@ -10,7 +10,6 @@ gcloud ai-platform jobs submit training $JOB_NAME \
         --file_csv=https://datahub.io/cryptocurrency/bitcoin/datapackage.json \
         --days_to_predict=100 \
         --epochs=200 \
-        --iterations=50 \
-        --output_file=percent_tunning_results.cfg \
-        --classification_model \
-        --prefix_models=percent
+        --iterations=100 \
+        --output_file=tunning_price2_decay_small_seq.cfg \
+        --prefix_models=price

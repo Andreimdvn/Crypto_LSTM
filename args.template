@@ -1,11 +1,11 @@
 --file_csv=datahub/bitcoin_datahub.csv
 --days_to_predict=100
---epochs=100
+--epochs=30
 --batch_size=16
---lstm_units=64
+--lstm_units=32
 --number_of_layers=1
 --dropout_rate=0.2
---learning_rate=0.001
---sequence_length=30
---output_file=decay_local_test3
+--learning_rate=0.01
+--sequence_length=20
+--output_file=best_std2
 --early_stop

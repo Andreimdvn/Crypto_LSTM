@@ -14,8 +14,8 @@ class CryptoDataLoader:
     Can load from URL or from local CSV file
     Produces train and test arrays
     """
-    def __init__(self, csv_source, days_to_predict, sequence_length, use_percentage, relative_price_change,
-                 columns=None):
+    def __init__(self, csv_source, days_to_predict, sequence_length, use_percentage, log_return,
+                 columns=None, best_std_for_train=True):
         self.sequence_length = sequence_length
         self.__days_to_predict = days_to_predict
         self.data = self.__load_data(csv_source)
@@ -27,10 +27,16 @@ class CryptoDataLoader:
         self.__min_max_scaler = MinMaxScaler()
         if use_percentage:
             self.__transform_price_to_percentage()
-        if relative_price_change:
-            self.x_train, self.y_train, self.x_test, self.y_test = self.__create_relative_price_change_sequences()
-        else:
-            self.x_train, self.y_train, self.x_test, self.y_test = self.__create_sequences()
+        if log_return:
+            self.__transform_price_to_log_return()
+        self.x_train, self.y_train, self.x_test, self.y_test = self.__create_sequences()
+
+        if best_std_for_train:
+            stds = np.array([seq.std() for seq in self.x_train])
+            best_idx = np.argsort(stds)[len(self.x_train)//2:]
+            print('Using idx with max std: ', best_idx)
+            self.x_train = self.x_train[best_idx]
+            self.y_train = self.y_train[best_idx]
 
         self.log_data_shapes()
 
@@ -61,9 +67,11 @@ class CryptoDataLoader:
     def __create_sequences(self):
         # apply min max scaler
         train = self.data['price(USD)'].values[:-self.__days_to_predict]
-        train = self.__min_max_scaler.fit_transform(np.reshape(train, (len(train), 1)))
+        train = np.reshape(train, (len(train), 1))
+        train = self.__min_max_scaler.fit_transform(train)
         test = self.data['price(USD)'].values[-self.__days_to_predict:]
-        test = self.__min_max_scaler.transform(np.reshape(test, (len(test), 1)))
+        test = np.reshape(test, (len(test), 1))
+        test = self.__min_max_scaler.transform(test)
 
         input_sequence = []
         output_sequence = []
@@ -94,11 +102,5 @@ class CryptoDataLoader:
         print("Created percentages from prices:", a[-10:], b[-10:], percentages[-10:])
         self.data['price(USD)'] = percentages
 
-    def __create_relative_price_change_sequences(self):
-        values = self.data['price(USD)'].values
-        sequences = [values[i: i + self.sequence_length + 1] / values[i-1] - 1
-                     for i in range(1, len(values) - self.sequence_length)]
-        input_sequences = [seq[:-1] for seq in sequences]
-        output_sequences = [seq[-1] for seq in sequences]
-
-
+    def __transform_price_to_log_return(self):
+        self.data['price(USD)'] = np.concatenate((np.array([0]), np.diff(np.log(self.data['price(USD)'].values))))

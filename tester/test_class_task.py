@@ -11,7 +11,7 @@ from utils.display_functions import display_confusion_matrix
 
 def main(csv_data_file, model_file, days_to_predict, consecutive_predictions, percentage_normalizer, sequence_length):
     data_loader = data_loader_factory.get_data_loader(csv_data_file, days_to_predict, percentage_normalizer,
-                                                      sequence_length, relative_price_change=False,
+                                                      sequence_length, log_return=False,
                                                       classification_output=True)
     lstm_model = LstmClassModel()
     lstm_model.load_from_file(model_file)

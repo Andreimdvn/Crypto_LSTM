@@ -14,9 +14,9 @@ from utils.np_functions import get_price_series_from_start_price_and_percentage,
 
 
 def main(csv_data_file, model_file, days_to_predict, consecutive_predictions, percentage_normalizer, sequence_length,
-         relative_price_change):
+         log_return):
     data_loader = data_loader_factory.get_data_loader(csv_data_file, days_to_predict, percentage_normalizer,
-                                                      sequence_length, relative_price_change)
+                                                      sequence_length, log_return)
     lstm_model = LstmModel()
     lstm_model.load_from_file(model_file)
 
@@ -34,6 +34,7 @@ def main(csv_data_file, model_file, days_to_predict, consecutive_predictions, pe
             # print(day_input_to_predict[0][-1][0] > new_prediction[0][0], day_input_to_predict[0][-1][0], new_prediction[0][0])
             y_predicted.append(new_prediction[0])
             day_input_to_predict = np.append(day_input_to_predict[0][1:], new_prediction)
+        y_predicted = np.array(y_predicted)
     actual = data_loader.reverse_min_max(data_loader.y_test)
     predicted = data_loader.reverse_min_max(y_predicted)
     print('y_test shape', data_loader.y_test.shape)
@@ -102,8 +103,7 @@ def init_arg_parser():
     parser.add_argument('-s', '--sequence_length', dest='sequence_length',
                         help='number of timestamps used for prediction',
                         type=int, default=defaults.DEFAULT_SEQUENCE_LENGTH)
-    parser.add_argument('-R', '--relative_price_change', dest='relative_price_change',
-                        help='Will convert prices to relative percentage change to the beginning of the sequence',
+    parser.add_argument('-L', '--log_return', dest='log_return', help='Will convert prices to log return',
                         default=False, action='store_true')
 
     return parser.parse_args()
@@ -112,4 +112,4 @@ def init_arg_parser():
 if __name__ == "__main__":
     args = init_arg_parser()
     main(args.csv_data_file, args.model_file, int(args.days_to_predict), args.consecutive_prediction,
-         args.percentage_prediction, args.sequence_length, args.relative_price_change)
+         args.percentage_prediction, args.sequence_length, args.log_return)

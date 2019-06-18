@@ -7,14 +7,14 @@ from utils.format_functions import get_output_file_name
 
 
 def main(csv_data_file, days_to_predict, epochs, batch_size, lstm_units, sequence_length, number_of_layers,
-         dropout_rate, learning_rate, percentage_normalizer, relative_price_change, output_file, use_early_stop,
+         dropout_rate, learning_rate, percentage_normalizer, log_return, output_file, use_early_stop,
          decay_rate, job_dir):
     output_file = get_output_file_name(output_file, days_to_predict, epochs, batch_size, lstm_units, sequence_length,
                                        number_of_layers, dropout_rate, learning_rate, percentage_normalizer, decay_rate)
     history_output_file = "history_{}".format(output_file)
 
     data_loader = data_loader_factory.get_data_loader(csv_data_file, days_to_predict, percentage_normalizer,
-                                                      sequence_length, relative_price_change=relative_price_change)
+                                                      sequence_length, log_return=log_return)
     lstm_model = LstmModel()
     lstm_model.init_model(lstm_units, number_of_layers, dropout_rate, data_loader.features, learning_rate, decay_rate)
 
@@ -52,8 +52,7 @@ def init_arg_parser():
                         type=float, default=defaults.DEFAULT_LEARNING_RATE)
     parser.add_argument('-p', '--percentage_prediction', dest='percentage',
                         help='Will convert prices to percentage change', default=False, action='store_true')
-    parser.add_argument('-R', '--relative_price_change', dest='relative_price_change',
-                        help='Will convert prices to relative percentage change to the beginning of the sequence',
+    parser.add_argument('-L', '--log_return', dest='log_return', help='Will convert prices to log return',
                         default=False, action='store_true')
     parser.add_argument('-o', '--output_file', dest='output_file',
                         help='{prefix}_epochs_batch_sequence_predictdays_LSTMunits_layers_drop_lr.cfg', type=str,
@@ -74,4 +73,4 @@ if __name__ == "__main__":
     print(args.__dict__)
     main(args.csv_data_file, args.days_to_predict, int(args.epochs), int(args.batch_size), int(args.lstm_units),
          int(args.sequence_length), int(args.number_of_layers), float(args.dropout_rate), float(args.learning_rate),
-         args.percentage, args.relative_price_change, args.output_file, args.early_stop, args.decay_rate, args.job_dir)
+         args.percentage, args.log_return, args.output_file, args.early_stop, args.decay_rate, args.job_dir)
