@@ -1,15 +1,16 @@
 gcloud ai-platform jobs submit training $JOB_NAME \
         --scale-tier basic \
-		--package-path /home/moldovanndrei/Crypto_LSTM/trainer \
+        --package-path /home/moldovanndrei/Crypto_LSTM/trainer \
         --module-name $MAIN_TRAINER_MODULE \
         --job-dir $JOB_DIR \
         --region $REGION \
         --runtime-version $RUNTIME_VERSION \
         --python-version $PYTHON_VERSION \
         -- \
-        --file_csv=https://datahub.io/cryptocurrency/basic_attention_token/datapackage.json \
+        --file_csv=datahub/bitcoin_datahub.csv \
         --days_to_predict=100 \
-        --epochs=200 \
-        --iterations=100 \
-        --output_file=bat2_tunning_price.cfg \
-        --prefix_models=bat2_price
+        --epochs=500 \
+        --iterations=50 \
+        --output_file=tunning_multi2.cfg \
+        --prefix_models=multi2_btc \
+        --multiple_features
