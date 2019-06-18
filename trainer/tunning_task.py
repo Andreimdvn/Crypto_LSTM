@@ -14,8 +14,9 @@ number_of_layers = [1, 2]
 dropout_rate = np.linspace(0, 0.25, 6)
 learning_rate = [0.001, 0.005, 0.01]
 batch_size = [8, 16, 32]
-sequence_length = [10, 15, 20, 30, 40]
-decay_rate = [0.01, 0.05, 0.005]
+sequence_length = [10, 15, 20, 30, 40, 60]
+decay_rate = [0]
+# decay_rate = [0, 0.01, 0.05, 0.005]
 
 
 def get_parameters(used_params, parameters):
