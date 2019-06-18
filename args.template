@@ -7,5 +7,6 @@
 --dropout_rate=0.2
 --learning_rate=0.01
 --sequence_length=20
---output_file=best_std2
+--output_file=multi
 --early_stop
+--multiple_features

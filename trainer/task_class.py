@@ -8,7 +8,7 @@ from utils.format_functions import get_output_file_name
 
 def main(csv_data_file, days_to_predict, epochs, batch_size, lstm_units, sequence_length, number_of_layers,
          dropout_rate, learning_rate, percentage_normalizer, log_return, output_file, use_early_stop,
-         decay_rate, job_dir):
+         decay_rate, multiple_features, job_dir):
     output_file = get_output_file_name(output_file, days_to_predict, epochs, batch_size, lstm_units, sequence_length,
                                        number_of_layers, dropout_rate, learning_rate, percentage_normalizer, decay_rate)
     history_output_file = "history_{}".format(output_file)

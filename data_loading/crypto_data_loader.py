@@ -21,8 +21,9 @@ class CryptoDataLoader:
         self.data = self.__load_data(csv_source)
         print("Data Loaded: {}".format(self.data.describe()))
         self.data = self.data.dropna()
-        self.data = self.__filter_columns(columns)
-        self.price_values = np.copy(self.data['price(USD)'].values)
+        self.columns = columns
+        self.data = self.data[columns]
+        self.price_values = np.copy(self.data[self.columns[0]].values)
         self.features = len(self.data.columns)
         self.__min_max_scaler = MinMaxScaler()
         if use_percentage:
@@ -66,11 +67,9 @@ class CryptoDataLoader:
 
     def __create_sequences(self):
         # apply min max scaler
-        train = self.data['price(USD)'].values[:-self.__days_to_predict]
-        train = np.reshape(train, (len(train), 1))
+        train = self.data.values[:-self.__days_to_predict]
         train = self.__min_max_scaler.fit_transform(train)
-        test = self.data['price(USD)'].values[-self.__days_to_predict:]
-        test = np.reshape(test, (len(test), 1))
+        test = self.data.values[-self.__days_to_predict:]
         test = self.__min_max_scaler.transform(test)
 
         input_sequence = []
@@ -78,7 +77,7 @@ class CryptoDataLoader:
         used_values = np.concatenate((train, test))
         for start_day in range(len(used_values) - self.sequence_length - 1):
             input_sequence.append(used_values[start_day: start_day + self.sequence_length])
-            output_sequence.append(used_values[start_day + self.sequence_length])
+            output_sequence.append(used_values[start_day + self.sequence_length][0])
 
         np_input = np.array(input_sequence)
         np_output = np.array(output_sequence)
@@ -90,17 +89,12 @@ class CryptoDataLoader:
 
         return x_train, y_train, x_test, y_test
 
-    def __filter_columns(self, columns):
-        if columns is None:
-            columns = ['price(USD)']
-        return self.data[columns]
-
     def __transform_price_to_percentage(self):
-        a = self.data['price(USD)'].values
+        a = self.data[self.columns[0]].values
         b = np.concatenate((np.array([a[0]]), a[:-1]))
         percentages = a/b - 1
         print("Created percentages from prices:", a[-10:], b[-10:], percentages[-10:])
-        self.data['price(USD)'] = percentages
+        self.data[self.columns[0]] = percentages
 
     def __transform_price_to_log_return(self):
-        self.data['price(USD)'] = np.concatenate((np.array([0]), np.diff(np.log(self.data['price(USD)'].values))))
+        self.data[self.columns[0]] = np.concatenate((np.array([0]), np.diff(np.log(self.data[self.columns[0]].values))))

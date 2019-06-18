@@ -8,13 +8,14 @@ from utils.format_functions import get_output_file_name
 
 def main(csv_data_file, days_to_predict, epochs, batch_size, lstm_units, sequence_length, number_of_layers,
          dropout_rate, learning_rate, percentage_normalizer, log_return, output_file, use_early_stop,
-         decay_rate, job_dir):
+         decay_rate, multiple_features, job_dir):
     output_file = get_output_file_name(output_file, days_to_predict, epochs, batch_size, lstm_units, sequence_length,
                                        number_of_layers, dropout_rate, learning_rate, percentage_normalizer, decay_rate)
     history_output_file = "history_{}".format(output_file)
 
     data_loader = data_loader_factory.get_data_loader(csv_data_file, days_to_predict, percentage_normalizer,
-                                                      sequence_length, log_return=log_return)
+                                                      sequence_length, log_return=log_return,
+                                                      multiple_features=multiple_features)
     lstm_model = LstmModel()
     lstm_model.init_model(lstm_units, number_of_layers, dropout_rate, data_loader.features, learning_rate, decay_rate)
 
@@ -62,6 +63,8 @@ def init_arg_parser():
                         action='store_true')
     parser.add_argument("-j", '--job-dir', dest='job_dir', help='jobs dir used for gcloud training', required=False,
                         default=None)
+    parser.add_argument('-m', '--multiple_features', dest='multiple_features',
+                        help='Use multiple features alongside price', default=False, action='store_true')
     parser.add_argument('-D', '--decay_rate', dest='decay_rate', help='decay rate of the adam optimizer',
                         type=float, default=defaults.DEFAULT_DECAY_RATE)
 
@@ -73,4 +76,5 @@ if __name__ == "__main__":
     print(args.__dict__)
     main(args.csv_data_file, args.days_to_predict, int(args.epochs), int(args.batch_size), int(args.lstm_units),
          int(args.sequence_length), int(args.number_of_layers), float(args.dropout_rate), float(args.learning_rate),
-         args.percentage, args.log_return, args.output_file, args.early_stop, args.decay_rate, args.job_dir)
+         args.percentage, args.log_return, args.output_file, args.early_stop, args.decay_rate, args.multiple_features,
+         args.job_dir)

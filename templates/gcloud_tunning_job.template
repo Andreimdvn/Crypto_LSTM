@@ -7,9 +7,9 @@ gcloud ai-platform jobs submit training $JOB_NAME \
         --runtime-version $RUNTIME_VERSION \
         --python-version $PYTHON_VERSION \
         -- \
-        --file_csv=https://datahub.io/cryptocurrency/bitcoin/datapackage.json \
+        --file_csv=https://datahub.io/cryptocurrency/basic_attention_token/datapackage.json \
         --days_to_predict=100 \
         --epochs=200 \
         --iterations=100 \
-        --output_file=tunning_price2_decay_small_seq.cfg \
-        --prefix_models=price
+        --output_file=bat2_tunning_price.cfg \
+        --prefix_models=bat2_price

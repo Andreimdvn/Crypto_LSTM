@@ -28,7 +28,7 @@ def get_parameters(used_params, parameters):
 
 
 def main(csv_data_file, days_to_predict, epochs, job_dir, iterations, percentage_normalizer, log_return,
-         results_output_file, prefix_models, classification_model):
+         results_output_file, prefix_models, classification_model, multiple_features):
     parameters_choice = dict(lstm_units=lstm_units,
                              number_of_layers=number_of_layers,
                              dropout_rate=dropout_rate,
@@ -64,6 +64,7 @@ def main(csv_data_file, days_to_predict, epochs, job_dir, iterations, percentage
                                    output_file=output_file,
                                    use_early_stop=True,
                                    decay_rate=parameters['decay_rate'],
+                                   multiple_features=multiple_features,
                                    job_dir=job_dir)
         end_time = time.time()
         parameters['loss'] = model_history.history['loss'][-1]
@@ -112,6 +113,8 @@ def init_arg_parser():
     parser.add_argument('-o', '--output_file', dest='output_file', help='output file for results of the random search')
     parser.add_argument('-c', '--classification_model', dest='classification_model',
                         help='Use classification model', default=False, action='store_true')
+    parser.add_argument('-m', '--multiple_features', dest='multiple_features',
+                        help='Use multiple features alongside price', default=False, action='store_true')
 
     return parser.parse_args()
 
@@ -120,4 +123,5 @@ if __name__ == '__main__':
     args = init_arg_parser()
     print(args.__dict__)
     main(args.csv_data_file, int(args.days_to_predict), int(args.epochs), args.job_dir, int(args.iterations),
-         args.percentage, args.log_return, args.output_file, args.prefix_models, args.classification_model)
+         args.percentage, args.log_return, args.output_file, args.prefix_models, args.multiple_features,
+         args.classification_model)
