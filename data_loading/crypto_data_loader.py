@@ -15,7 +15,7 @@ class CryptoDataLoader:
     Produces train and test arrays
     """
     def __init__(self, csv_source, days_to_predict, sequence_length, use_percentage, log_return,
-                 columns=None, best_std_for_train=True):
+                 columns=None, best_std_for_train=False):
         self.sequence_length = sequence_length
         self.__days_to_predict = days_to_predict
         self.data = self.__load_data(csv_source)
