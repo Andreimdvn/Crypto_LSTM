@@ -1,4 +1,5 @@
 import time
+import traceback
 
 import numpy as np
 import pandas as pd
@@ -42,18 +43,20 @@ class CryptoDataLoader:
         self.log_data_shapes()
 
     def __load_data(self, csv_source):
-        start = time.time()
         if 'http'in csv_source:
             import datapackage
-            package = datapackage.Package(csv_source)
-            resources = package.resources
-            for resource in resources:
-                if resource.tabular:
-                    return pd.read_csv(resource.descriptor['path'])
+            while 1:
+                try:
+                    package = datapackage.Package(csv_source)
+                    resources = package.resources
+                    for resource in resources:
+                        if resource.tabular:
+                            return pd.read_csv(resource.descriptor['path'])
+                except:
+                    print("Failed to load Data from {}. WIll reload. Tracebac: {}".format(csv_source,
+                                                                                          traceback.format_exc()))
         else:
             return pd.read_csv(csv_source)
-        end = time.time()
-        print("Loaded data in {} seconds".format(end - start))
 
     def log_data_shapes(self):
         print("Data loaded:")
