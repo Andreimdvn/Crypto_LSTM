@@ -1,6 +1,7 @@
 import pickle
 
 import keras
+from keras import backend as K
 from keras.models import Sequential
 from keras.layers import Dense, Dropout
 from keras.layers import LSTM
@@ -13,6 +14,10 @@ class LstmClassModel:
     def __init__(self):
         self.model = None
         self.history = None
+
+    def delete(self):
+        K.clear_session()
+        del self.model
 
     def load_from_file(self, file_path):
         self.model = keras.models.load_model(file_path)

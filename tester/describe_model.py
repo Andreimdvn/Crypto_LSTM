@@ -1,3 +1,4 @@
+import os
 import pickle
 import sys
 
@@ -23,7 +24,13 @@ def main(model_file_path, history_file_path):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 3:
-        print("Usage: py {} MODEL_PATH MODEL_HISTORY_PATH".format(__name__))
+    if len(sys.argv) != 2:
+        print("Usage: py {} MODEL_PATH OPTIONAL_MODEL_HISTORY_PATH".format(__name__))
         sys.exit(1)
-    main(sys.argv[1], sys.argv[2])
+    model_file = sys.argv[1]
+    if len(sys.argv) < 3:
+        folder, file = os.path.split(model_file)
+        history_file = "{}/history_{}".format(folder, file)
+    else:
+        history_file = sys.argv[2]
+    main(model_file, history_file)

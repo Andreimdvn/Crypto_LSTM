@@ -29,7 +29,7 @@ def get_parameters(used_params, parameters):
 
 
 def main(csv_data_file, days_to_predict, epochs, job_dir, iterations, percentage_normalizer, log_return,
-         results_output_file, prefix_models, classification_model, multiple_features):
+         results_output_file, prefix_models, multiple_features, classification_model):
     parameters_choice = dict(lstm_units=lstm_units,
                              number_of_layers=number_of_layers,
                              dropout_rate=dropout_rate,

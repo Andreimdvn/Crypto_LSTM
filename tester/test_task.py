@@ -35,7 +35,7 @@ def main(csv_data_file, model_file, days_to_predict, consecutive_predictions, pe
             y_predicted.append(new_prediction[0])
             day_input_to_predict = np.append(day_input_to_predict[0][1:], new_prediction)
         y_predicted = np.array(y_predicted)
-    actual = data_loader.reverse_min_max(data_loader.y_test)
+    actual = data_loader.reverse_min_max(np.reshape(data_loader.y_test, (len(data_loader.y_test), 1)))
     predicted = data_loader.reverse_min_max(y_predicted)
     print('y_test shape', data_loader.y_test.shape)
     print('y_pred shape', y_predicted.shape)
@@ -62,7 +62,7 @@ def main(csv_data_file, model_file, days_to_predict, consecutive_predictions, pe
         print("Predicted price: ", predicted)
     else:
         plot_result_lines(actual, predicted, block=False)
-        previous_price = data_loader.reverse_min_max(data_loader.y_train)[-100:]
+        previous_price = data_loader.reverse_min_max(np.reshape(data_loader.y_train, (len(data_loader.y_train), 1)))[-100:]
         actual_price = np.concatenate((previous_price, actual))
         predicted_price = np.concatenate((previous_price, predicted))
         visualize_results((actual_price, predicted_price), labels=('actual BTC price', 'predicted BTC price'), block=False)
@@ -71,12 +71,13 @@ def main(csv_data_file, model_file, days_to_predict, consecutive_predictions, pe
 
     if not consecutive_predictions:  # plot sample of prediction vs actual in multiple subplots
         if not percentage_normalizer:
+            print('x_test shape', data_loader.x_test.shape)
             reshaped_x_test = np.reshape(data_loader.x_test, (len(data_loader.x_test), data_loader.x_test.shape[1] *
                                                               data_loader.x_test.shape[2]))
             actual_price_input = data_loader.reverse_min_max(reshaped_x_test)
             actual_price_input = np.reshape(actual_price_input, data_loader.x_test.shape)
-            print("Binary Accuracy: {}".format(get_binary_accuracy_from_price_prediction(actual_price_input, actual,
-                                                                                         predicted)))
+            print("Binary Accuracy: {}".format(get_binary_accuracy_from_price_prediction(actual_price_input[:, :, 0],
+                                                                                         actual, predicted)))
             confusion_matrix, f1score = get_confusion_matrix_f1score_for_price_prediction(
                 actual_price_input, actual, predicted)
             display_confusion_matrix(confusion_matrix)

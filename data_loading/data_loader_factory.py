@@ -7,7 +7,6 @@ from data_loading.local_ripple_data_loader import LocalRippleDataLoader
 
 def get_data_loader(csv_source, days_to_predict, percentage_normalizer, sequence_length, log_return=False,
                     classification_output=False, multiple_features=False):
-
     if classification_output:
         if log_return:
             raise NotImplementedError("Relative price change is not implemented for the classification model!")

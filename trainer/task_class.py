@@ -27,7 +27,7 @@ def main(csv_data_file, days_to_predict, epochs, batch_size, lstm_units, sequenc
     else:
         lstm_model.save_model(output_file)
         lstm_model.save_history(history_output_file)
-
+    lstm_model.delete()
     return lstm_model.history
 
 
