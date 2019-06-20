@@ -7,10 +7,10 @@ gcloud ai-platform jobs submit training $JOB_NAME \
         --runtime-version $RUNTIME_VERSION \
         --python-version $PYTHON_VERSION \
         -- \
-        --file_csv=datahub/bitcoin_datahub.csv \
+        --file_csv=https://datahub.io/cryptocurrency/bitcoin/datapackage.json \
         --days_to_predict=100 \
         --epochs=500 \
         --iterations=50 \
-        --output_file=tunning_multi2.cfg \
-        --prefix_models=multi2_btc \
+        --output_file=tunning_multi.cfg \
+        --prefix_models=multi_btc \
         --multiple_features

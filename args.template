@@ -1,6 +1,6 @@
---file_csv=datahub/bitcoin_datahub.csv
+--file_csv=datahub/btc_full.csv
 --days_to_predict=100
---epochs=30
+--epochs=100
 --batch_size=16
 --lstm_units=32
 --number_of_layers=1

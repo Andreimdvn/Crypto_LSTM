@@ -14,6 +14,7 @@ def get_data_loader(csv_source, days_to_predict, percentage_normalizer, sequence
     if 'datahub' in csv_source:
         if multiple_features:
             columns = ['price(USD)', 'exchangeVolume(USD)', 'fees', 'averageDifficulty', 'activeAddresses']
+            print('using multiple features!')
         else:
             columns = ['price(USD)']
 
