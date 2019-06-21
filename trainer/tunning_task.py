@@ -114,7 +114,7 @@ def init_arg_parser():
     parser.add_argument('-o', '--output_file', dest='output_file', help='output file for results of the random search')
     parser.add_argument('-c', '--classification_model', dest='classification_model',
                         help='Use classification model', default=False, action='store_true')
-    parser.add_argument('-m', '--multiple_features', dest='multiple_features',
+    parser.add_argument('-M', '--multiple_features', dest='multiple_features',
                         help='Use multiple features alongside price', default=False, action='store_true')
 
     return parser.parse_args()

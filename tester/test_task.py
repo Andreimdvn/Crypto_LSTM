@@ -14,9 +14,9 @@ from utils.np_functions import get_price_series_from_start_price_and_percentage,
 
 
 def main(csv_data_file, model_file, days_to_predict, consecutive_predictions, percentage_normalizer, sequence_length,
-         log_return):
+         log_return, multiple_features):
     data_loader = data_loader_factory.get_data_loader(csv_data_file, days_to_predict, percentage_normalizer,
-                                                      sequence_length, log_return)
+                                                      sequence_length, log_return, multiple_features=multiple_features)
     lstm_model = LstmModel()
     lstm_model.load_from_file(model_file)
 
@@ -35,10 +35,10 @@ def main(csv_data_file, model_file, days_to_predict, consecutive_predictions, pe
             y_predicted.append(new_prediction[0])
             day_input_to_predict = np.append(day_input_to_predict[0][1:], new_prediction)
         y_predicted = np.array(y_predicted)
-    actual = data_loader.reverse_min_max(np.reshape(data_loader.y_test, (len(data_loader.y_test), 1)))
-    predicted = data_loader.reverse_min_max(y_predicted)
     print('y_test shape', data_loader.y_test.shape)
     print('y_pred shape', y_predicted.shape)
+    actual = data_loader.reverse_min_max_y(np.reshape(data_loader.y_test, (len(data_loader.y_test), 1)))
+    predicted = data_loader.reverse_min_max_y(y_predicted)
     print('Actual: ', actual)
     print('Predicted: ', predicted)
     print('positive actual: ', len(actual[actual > 0]))
@@ -62,7 +62,8 @@ def main(csv_data_file, model_file, days_to_predict, consecutive_predictions, pe
         print("Predicted price: ", predicted)
     else:
         plot_result_lines(actual, predicted, block=False)
-        previous_price = data_loader.reverse_min_max(np.reshape(data_loader.y_train, (len(data_loader.y_train), 1)))[-100:]
+        print('y_train shape', data_loader.y_train.shape)
+        previous_price = data_loader.price_values[:-100]  # data_loader.reverse_min_max(np.reshape(data_loader.y_train, (len(data_loader.y_train), data_loader.features)))[-100:0]
         actual_price = np.concatenate((previous_price, actual))
         predicted_price = np.concatenate((previous_price, predicted))
         visualize_results((actual_price, predicted_price), labels=('actual BTC price', 'predicted BTC price'), block=False)
@@ -72,11 +73,10 @@ def main(csv_data_file, model_file, days_to_predict, consecutive_predictions, pe
     if not consecutive_predictions:  # plot sample of prediction vs actual in multiple subplots
         if not percentage_normalizer:
             print('x_test shape', data_loader.x_test.shape)
-            reshaped_x_test = np.reshape(data_loader.x_test, (len(data_loader.x_test), data_loader.x_test.shape[1] *
-                                                              data_loader.x_test.shape[2]))
+            reshaped_x_test = np.reshape(data_loader.x_test, (data_loader.x_test.shape[0] * data_loader.x_test.shape[1], data_loader.x_test.shape[2]))
             actual_price_input = data_loader.reverse_min_max(reshaped_x_test)
-            actual_price_input = np.reshape(actual_price_input, data_loader.x_test.shape)
-            print("Binary Accuracy: {}".format(get_binary_accuracy_from_price_prediction(actual_price_input[:, :, 0],
+            actual_price_input = np.reshape(actual_price_input, data_loader.x_test.shape)[:, :, 0]
+            print("Binary Accuracy: {}".format(get_binary_accuracy_from_price_prediction(actual_price_input,
                                                                                          actual, predicted)))
             confusion_matrix, f1score = get_confusion_matrix_f1score_for_price_prediction(
                 actual_price_input, actual, predicted)
@@ -106,6 +106,8 @@ def init_arg_parser():
                         type=int, default=defaults.DEFAULT_SEQUENCE_LENGTH)
     parser.add_argument('-L', '--log_return', dest='log_return', help='Will convert prices to log return',
                         default=False, action='store_true')
+    parser.add_argument('-M', '--multiple_features', dest='multiple_features',
+                        help='Use multiple features alongside price', default=False, action='store_true')
 
     return parser.parse_args()
 
@@ -113,4 +115,4 @@ def init_arg_parser():
 if __name__ == "__main__":
     args = init_arg_parser()
     main(args.csv_data_file, args.model_file, int(args.days_to_predict), args.consecutive_prediction,
-         args.percentage_prediction, args.sequence_length, args.log_return)
+         args.percentage_prediction, args.sequence_length, args.log_return, args.multiple_features)

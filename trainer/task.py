@@ -63,7 +63,7 @@ def init_arg_parser():
                         action='store_true')
     parser.add_argument("-j", '--job-dir', dest='job_dir', help='jobs dir used for gcloud training', required=False,
                         default=None)
-    parser.add_argument('-m', '--multiple_features', dest='multiple_features',
+    parser.add_argument('-M', '--multiple_features', dest='multiple_features',
                         help='Use multiple features alongside price', default=False, action='store_true')
     parser.add_argument('-D', '--decay_rate', dest='decay_rate', help='decay rate of the adam optimizer',
                         type=float, default=defaults.DEFAULT_DECAY_RATE)

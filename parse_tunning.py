@@ -22,10 +22,11 @@ def get_model__path_form_dir_and_prefix(dir, prefix, sequence, lstm_units, batch
                 return os.path.join(root, file)
 
 
-def evaluate_model(model_file, csv_data_file, days_to_predict, sequence_length):
+def evaluate_model(model_file, csv_data_file, days_to_predict, sequence_length, multiple_features):
     start_loading = time.time()
     data_loader = data_loader_factory.get_data_loader(csv_data_file, days_to_predict, percentage_normalizer=False,
-                                                      sequence_length=sequence_length, log_return=False)
+                                                      sequence_length=sequence_length, log_return=False,
+                                                      multiple_features=multiple_features)
     end_loading = time.time()
     print('Data loaded in {}s'.format(end_loading - start_loading))
     start_loading = time.time()
@@ -35,20 +36,20 @@ def evaluate_model(model_file, csv_data_file, days_to_predict, sequence_length):
     print('Model loaded in {}s'.format(end_loading - start_loading))
 
     y_predicted = lstm_model.test_model(data_loader.x_test)
-    actual = data_loader.reverse_min_max(np.reshape(data_loader.y_test, (len(data_loader.y_test), 1)))
-    predicted = data_loader.reverse_min_max(y_predicted)
-    reshaped_x_test = np.reshape(data_loader.x_test, (len(data_loader.x_test), data_loader.x_test.shape[1] *
-                                                      data_loader.x_test.shape[2]))
+    actual = data_loader.reverse_min_max_y(np.reshape(data_loader.y_test, (len(data_loader.y_test), 1)))
+    predicted = data_loader.reverse_min_max_y(y_predicted)
+    reshaped_x_test = np.reshape(data_loader.x_test, (
+        data_loader.x_test.shape[0] * data_loader.x_test.shape[1], data_loader.x_test.shape[2]))
     actual_price_input = data_loader.reverse_min_max(reshaped_x_test)
-    actual_price_input = np.reshape(actual_price_input, data_loader.x_test.shape)
-    acc = get_binary_accuracy_from_price_prediction(actual_price_input[:, :, 0], actual, predicted)
+    actual_price_input = np.reshape(actual_price_input, data_loader.x_test.shape)[:, :, 0]
+    acc = get_binary_accuracy_from_price_prediction(actual_price_input, actual, predicted)
     confusion_matrix, f1score = get_confusion_matrix_f1score_for_price_prediction(actual_price_input, actual, predicted)
     lstm_model.delete()
 
     return acc, confusion_matrix, f1score
 
 
-def main(csv_data_file, tunning_results, days_to_predict):
+def main(csv_data_file, tunning_results, days_to_predict, multiple_features):
     tunning_data = pd.read_csv(tunning_results)
     tunning_data = tunning_data.sort_values('val_loss')
     accuracies = []
@@ -60,7 +61,8 @@ def main(csv_data_file, tunning_results, days_to_predict):
                                                          "{}LSTM".format(model['lstm_units']),
                                                          "{}batch".format(model['batch_size']))
         gc.collect()
-        acc, conf_matrix, f1 = evaluate_model(model_file, csv_data_file, days_to_predict, int(model['sequence_length']))
+        acc, conf_matrix, f1 = evaluate_model(model_file, csv_data_file, days_to_predict, int(model['sequence_length']),
+                                              multiple_features)
         accuracies.append(acc)
         confusion_matrices.append("{} {} {} {}".format(*conf_matrix))
         f_ones.append(f1)
@@ -83,10 +85,11 @@ def init_arg_parser():
     parser.add_argument('-d', '--days_to_predict', dest='days_to_predict',
                         help='Days to predict. Training set = last number of days',
                         type=int, default=defaults.DEFAULT_DAYS_TO_PREDICT)
-
+    parser.add_argument('-M', '--multiple_features', dest='multiple_features',
+                        help='Use multiple features alongside price', default=False, action='store_true')
     return parser.parse_args()
 
 
 if __name__ == "__main__":
     args = init_arg_parser()
-    main(args.csv_data_file, args.tunning_results, int(args.days_to_predict))
+    main(args.csv_data_file, args.tunning_results, int(args.days_to_predict), args.multiple_features)

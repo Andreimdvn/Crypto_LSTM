@@ -68,6 +68,11 @@ class CryptoDataLoader:
     def reverse_min_max(self, values):
         return self.__min_max_scaler.inverse_transform(values)
 
+    def reverse_min_max_y(self, values):
+        print(values.shape)
+        out_data = self.__min_max_scaler.inverse_transform(np.concatenate((values,) * self.features, axis=1))
+        return out_data[:, 0]
+
     def __create_sequences(self):
         # apply min max scaler
         train = self.data.values[:-self.__days_to_predict]

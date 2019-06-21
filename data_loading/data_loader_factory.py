@@ -13,8 +13,11 @@ def get_data_loader(csv_source, days_to_predict, percentage_normalizer, sequence
         return CryptoDataLoaderClassifier(csv_source, days_to_predict, sequence_length, percentage_normalizer)
     if 'datahub' in csv_source:
         if multiple_features:
-            columns = ['price(USD)', 'exchangeVolume(USD)', 'fees', 'averageDifficulty', 'activeAddresses']
-            print('using multiple features!')
+            if 'bat' in csv_source:
+                columns = ['price(USD)', 'exchangeVolume(USD)', 'activeAddresses']
+            else:
+                columns = ['price(USD)', 'exchangeVolume(USD)', 'fees', 'averageDifficulty', 'activeAddresses']
+            print('using multiple features! {}'.format(columns))
         else:
             columns = ['price(USD)']
 
