@@ -1,12 +1,11 @@
---file_csv=datahub/btc_full.csv
+--file_csv=https://datahub.io/cryptocurrency/monero/datapackage.json
 --days_to_predict=100
---epochs=100
+--epochs=10
 --batch_size=16
 --lstm_units=32
 --number_of_layers=1
 --dropout_rate=0.2
 --learning_rate=0.01
 --sequence_length=20
---output_file=multi
+--output_file=monero
 --early_stop
---multiple_features
