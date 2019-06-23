@@ -8,7 +8,7 @@ from sklearn.preprocessing import MinMaxScaler
 from utils.display_functions import print_shape
 
 
-class CryptoDataLoader:
+class DatahubDataLoader:
     """
     Used to load data for any cryptocurrency
     Using https://datahub.io/cryptocurrency/
@@ -40,7 +40,7 @@ class CryptoDataLoader:
             self.x_train = self.x_train[best_idx]
             self.y_train = self.y_train[best_idx]
 
-        self.log_data_shapes()
+        self.__log_data_shapes()
 
     def __load_data(self, csv_source):
         if 'http'in csv_source:
@@ -58,7 +58,7 @@ class CryptoDataLoader:
         else:
             return pd.read_csv(csv_source)
 
-    def log_data_shapes(self):
+    def __log_data_shapes(self):
         print("Data loaded:")
         print_shape(self.x_train, "x_train")
         print_shape(self.y_train, "y_train")

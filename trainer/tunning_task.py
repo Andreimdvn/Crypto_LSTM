@@ -19,7 +19,7 @@ decay_rate = [0]
 # decay_rate = [0, 0.01, 0.05, 0.005]
 
 
-def get_parameters(used_params, parameters):
+def generate_tunning_params(used_params, parameters):
     while 1:
         new_choice = dict()
         for param_name in parameters.keys():
@@ -45,7 +45,7 @@ def main(csv_data_file, days_to_predict, epochs, job_dir, iterations, percentage
     results = []
     used_params = []
     for nr_iter in range(iterations):
-        parameters = get_parameters(used_params, parameters_choice)
+        parameters = generate_tunning_params(used_params, parameters_choice)
         print("Iteration {}. New parameters: {}".format(nr_iter, parameters))
         used_params.append(parameters.copy())
         output_file = '{}_model_{}'.format(prefix_models, nr_iter)

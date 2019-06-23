@@ -1,6 +1,6 @@
 from data_loading.crypto_data_loader_clasifier import CryptoDataLoaderClassifier
 from data_loading.local_bitcoin_percentage_data_loader import BitcoinPercentageDataLoader
-from data_loading.crypto_data_loader import CryptoDataLoader
+from data_loading.crypto_data_loader import DatahubDataLoader
 from data_loading.local_bitcoin_data_loader import LocalBitcoinDataLoader
 from data_loading.local_ripple_data_loader import LocalRippleDataLoader
 
@@ -24,8 +24,8 @@ def get_data_loader(csv_source, days_to_predict, percentage_normalizer, sequence
         if percentage_normalizer and log_return:
             raise Exception("It is not possible to use both percentage_normalizer and relative_price_change! "
                             "Choose one.")
-        return CryptoDataLoader(csv_source, days_to_predict, sequence_length, use_percentage=percentage_normalizer,
-                                log_return=log_return, columns=columns)
+        return DatahubDataLoader(csv_source, days_to_predict, sequence_length, use_percentage=percentage_normalizer,
+                                 log_return=log_return, columns=columns)
     else:
         if percentage_normalizer:
             return BitcoinPercentageDataLoader(csv_source, days_to_predict, sequence_length)

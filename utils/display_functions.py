@@ -1,3 +1,5 @@
+import random
+
 import matplotlib.pyplot as plt
 
 
@@ -15,6 +17,8 @@ def plot_result_lines(actual, predicted, block=False):
     for y1, y2, x in zip(actual, predicted, range(len(actual))):
         plt.vlines(x, ymin=y1, ymax=y2, colors='red')
     plt.plot(actual, color='black', label='actual price')
+    plt.plot(predicted, color='red', label='predicted price')
+    plt.legend(loc=0, prop={'size': 20})
     plt.title('Actual-Predicted diff', fontsize=30)
     plt.show(block=block)
 
@@ -66,16 +70,20 @@ def display_model_train_history_acc(model_fit_history, block=True):
 
 def display_plots_with_single_prediction(input_prices, actual_price, predicted_price):
     total_plots = min(3, len(input_prices)//9)
-    idx = 0
+    indexes = list(range(len(input_prices)))
+    random.shuffle(indexes)
+
+    rand_idx = 0
     for cur_plot in range(total_plots):
         f, axarr = plt.subplots(3, 3)
         for i in range(3):
             for j in range(3):
-                axarr[i, j].plot(input_prices[idx])
-                axarr[i, j].plot(len(input_prices[idx]), actual_price[idx], 'P', color='green')
-                axarr[i, j].plot(len(input_prices[idx]), predicted_price[idx], 'x', color='red')
+                idx = indexes[rand_idx]
+                axarr[i, j].plot(input_prices[idx], label='previous price used for prediction')
+                axarr[i, j].plot(len(input_prices[idx]), actual_price[idx], 'P', color='green', label='actual')
+                axarr[i, j].plot(len(input_prices[idx]), predicted_price[idx], 'x', color='red', label='predicted')
                 axarr[i, j].set_title("Prediction {}".format(idx))
-                idx += 1
+                rand_idx += 1
         plt.show(block=True)
 
 
