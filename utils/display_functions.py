@@ -87,6 +87,8 @@ def display_plots_with_single_prediction(input_prices, actual_price, predicted_p
         plt.show(block=True)
 
 
+
+
     # for i in range(len(input_prices)):
         # print("actual vs predicted for {}: {} vs {}".format(input_prices[i], actual_price[i], predicted_price[i]))
 
